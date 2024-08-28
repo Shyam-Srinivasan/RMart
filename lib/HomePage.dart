@@ -121,11 +121,11 @@ class Homepage extends StatelessWidget {
                         )
                       ]),
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(Icons.search, color: Colors.grey),
-                      SizedBox(width: 8.0),
-                      Expanded(
+                      Image.asset('assets/img/Search.gif', height: 24, width: 24),
+                      const SizedBox(width: 8.0),
+                      const Expanded(
                         child: Text(
                           'What would you like to have?',
                           style: TextStyle(color: Colors.grey),
@@ -203,10 +203,21 @@ class Homepage extends StatelessWidget {
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart),
             label: 'Cart',
+
           )
         ],
         onTap: (int index) {
-          print(index.toString());
+          switch(index){
+            case 0:
+              Navigator.pushNamed(context, '/home');
+              break;
+
+            case 1:
+              Navigator.pushNamed(context, '/orders');
+              break;
+            case 2:
+              Navigator.pushNamed(context, '/cart');
+          }
         },
       ),
       endDrawer: const Drawer(
@@ -224,7 +235,7 @@ class Homepage extends StatelessWidget {
             ),
             ListTile(
               title: Text('Favorites'),
-              leading: Icon(Icons.favorite, color: Colors.pink),
+              leading: Icon(Icons.favorite),
             ),
             ListTile(
               title: Text('Order History'),
@@ -238,6 +249,10 @@ class Homepage extends StatelessWidget {
               title: Text('About Us'),
               leading: Icon(Icons.info),
             ),
+            ListTile(
+              title: Text('Log out'),
+              leading: Icon(Icons.logout),
+            )
           ],
         ),
       ),

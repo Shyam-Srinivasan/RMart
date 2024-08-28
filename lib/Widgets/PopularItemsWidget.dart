@@ -36,7 +36,7 @@ class _AddToCartButtonState extends State<AddToCartButton> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 8.0),
+      padding: EdgeInsets.only(bottom: 8.0, right:5),
       child: AnimatedContainer(
         duration: Duration(milliseconds: 300),
         width: 100,
@@ -143,14 +143,6 @@ class PopularItemsWidget extends StatelessWidget {
                       ),
                       Row(
                         children: [
-                          Padding(
-                            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                            child: Image.asset(
-                              "assets/img/vegan.png",
-                              height: 25,
-                              width: 25,
-                            ),
-                          ),
                           Text(
                             " $foodName",
                             style: TextStyle(

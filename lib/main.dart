@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:rmart/Cart.dart';
+import 'package:rmart/Orders.dart';
 import 'package:rmart/splash_screen.dart';
 
 
@@ -22,6 +24,8 @@ class MyApp extends StatelessWidget {
       ),
       routes: {
         "/" : (context) => SplashScreen(),
+        "/orders" : (context) => OrdersPage(),
+        "/cart" : (context) => CartPage(),
       },
     );
   }
