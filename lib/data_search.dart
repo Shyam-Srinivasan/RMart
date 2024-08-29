@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:rmart/models/CartItems.dart';
-import 'package:rmart/Widgets/PopularItemsWidget.dart';// Make sure to import the AddToCartButton
+import 'package:rmart/models/cart_items.dart';
+import 'package:rmart/Widgets/popular_items_widget.dart';// Make sure to import the AddToCartButton
 
 class SearchPage extends StatefulWidget {
   @override

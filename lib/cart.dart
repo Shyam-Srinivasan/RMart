@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:rmart/models/CartItems.dart';
+import 'package:rmart/models/cart_items.dart';
 
 class CartPage extends StatefulWidget {
   @override

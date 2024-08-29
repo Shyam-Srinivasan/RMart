@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:rmart/Widgets/PopularItemsWidget.dart';
-import 'package:rmart/models/CartItems.dart'; // Import the CartItems class
+import 'package:rmart/Widgets/popular_items_widget.dart';
+import 'package:rmart/models/cart_items.dart'; // Import the CartItems class
 
 class Categories extends StatefulWidget {
   final String category;
@@ -42,7 +42,7 @@ class _CategoriesState extends State<Categories> {
   void _navigateToPage(int pageIndex, String category) {
     _pageController.animateToPage(
       pageIndex,
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
     setState(() {
@@ -88,24 +88,24 @@ class _CategoriesState extends State<Categories> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(80),
+        preferredSize: const Size.fromHeight(80),
         child: Column(
           children: [
             AppBar(
               leading: Padding(
-                padding: EdgeInsets.only(left: 0, top: 8),
+                padding: const EdgeInsets.only(left: 0, top: 8),
                 child: IconButton(
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  icon: Icon(Icons.arrow_back),
+                  icon: const Icon(Icons.arrow_back),
                 ),
               ),
               backgroundColor: Colors.white,
               title: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Padding(
-                  padding: EdgeInsets.only(left: 0, top: 8),
+                  padding: const EdgeInsets.only(left: 0, top: 8),
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
@@ -122,9 +122,9 @@ class _CategoriesState extends State<Categories> {
                 ),
               ),
             ),
-            SizedBox(height: 3),
+            const SizedBox(height: 3),
             Container(
-              color: Color(0x61693BB8),
+              color: const Color(0x61693BB8),
               height: 1.0,
             ),
           ],
@@ -143,10 +143,9 @@ class _CategoriesState extends State<Categories> {
   Widget _buildCategoryButton(String title, int pageIndex) {
     bool isSelected = _selectedCategory == title;
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: ElevatedButton(
         onPressed: () => _navigateToPage(pageIndex, title),
-        child: Text(title),
         style: ElevatedButton.styleFrom(
           foregroundColor: isSelected ? Colors.white : Colors.deepPurple,
           backgroundColor: isSelected ? Colors.deepPurple : Colors.white,
@@ -155,6 +154,7 @@ class _CategoriesState extends State<Categories> {
             borderRadius: BorderRadius.circular(15),
           ),
         ),
+        child: Text(title),
       ),
     );
   }
@@ -176,8 +176,8 @@ class _CategoriesState extends State<Categories> {
     }
 
     return GridView.builder(
-      padding: EdgeInsets.all(20),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      padding: const EdgeInsets.all(20),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: 25,
         mainAxisSpacing: 25,
@@ -200,7 +200,7 @@ class _CategoriesState extends State<Categories> {
                 color: Colors.grey.withOpacity(0.5),
                 spreadRadius: 3,
                 blurRadius: 10,
-                offset: Offset(0, 3),
+                offset: const Offset(0, 3),
               ),
             ],
           ),
@@ -220,7 +220,7 @@ class _CategoriesState extends State<Categories> {
                 Row(
                   children: [
                     Padding(
-                      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                       child: Image.asset(
                         "assets/img/vegan.png",
                         height: 25,
@@ -229,28 +229,28 @@ class _CategoriesState extends State<Categories> {
                     ),
                     Text(
                       " $itemName",
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(bottom: 10, left: 10),
+                      padding: const EdgeInsets.only(bottom: 10, left: 10),
                       child: Text(
                         "₹${itemPrice.toInt()}",
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                    SizedBox(width: 16),
+                    const SizedBox(width: 16),
                     Align(
                       alignment: Alignment.centerLeft,
                       child: AddToCartButton(foodItem: itemName),

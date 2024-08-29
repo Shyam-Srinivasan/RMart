@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rmart/models/CartItems.dart';
+import 'package:rmart/models/cart_items.dart';
 
 class AddToCartButton extends StatefulWidget {
   final String foodItem;

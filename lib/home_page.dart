@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'Widgets/CategoriesWidget.dart';
-import 'package:rmart/Categories.dart';
-import 'Widgets/PopularItemsWidget.dart';
+import 'Widgets/categories_widget.dart';
+import 'package:rmart/categories.dart';
+import 'Widgets/popular_items_widget.dart';
 import 'data_search.dart';
 
 class Homepage extends StatelessWidget {
