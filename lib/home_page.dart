@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:ui';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -17,11 +18,13 @@ class Homepage extends StatefulWidget {
 
 class _HomepageState extends State<Homepage> {
   bool _isLoading = true;
+  User? _currentUser;
 
   @override
   void initState() {
     super.initState();
     _loadData();
+    _getCurrentUser();
   }
 
   Future<void> _loadData() async {
@@ -30,6 +33,13 @@ class _HomepageState extends State<Homepage> {
 
     setState(() {
       _isLoading = false;
+    });
+  }
+
+  void _getCurrentUser() {
+    User? user = FirebaseAuth.instance.currentUser;
+    setState(() {
+      _currentUser = user;  // Store the logged-in user
     });
   }
 
@@ -45,9 +55,6 @@ class _HomepageState extends State<Homepage> {
 
   @override
   Widget build(BuildContext context) {
-    final arguments = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    final email = arguments['email'] ?? '';
-    final name = arguments['name'] ?? '';
 
     return Scaffold(
       appBar: AppBar(
@@ -279,8 +286,8 @@ class _HomepageState extends State<Homepage> {
         child: Column(
           children: <Widget>[
             UserAccountsDrawerHeader(
-              accountName: Text(name),
-              accountEmail: Text(email),
+              accountName: Text(_currentUser?.displayName ?? 'Guest'),
+              accountEmail: Text(_currentUser?.email ?? 'No email'),
               currentAccountPicture: const ClipOval(
                 child: Image(
                   image: AssetImage('assets/img/Shyam_photo.jpg'),
@@ -304,9 +311,15 @@ class _HomepageState extends State<Homepage> {
               title: Text('About Us'),
               leading: Icon(Icons.info),
             ),
-            const ListTile(
-              title: Text('Log out'),
-              leading: Icon(Icons.logout),
+            ListTile(
+              title: InkWell(
+                  onTap: () {
+                    // Navigate to Forgot Password page
+                    Navigator.pushNamed(context, '/signIn');
+                  },
+                  child: const Text('Log out')
+              ),
+              leading: const Icon(Icons.logout),
             ),
           ],
         ),
