@@ -33,7 +33,6 @@ class CartItems {
     'Dark Fantasy': CartItem(price: 20.0, quantity: 0),
     'Cavins': CartItem(price: 40.0, quantity: 0),
     'Frooti': CartItem(price: 40.0, quantity: 0),
-    'Icecream': CartItem(price: 20.0, quantity: 0),
   };
 
   // Add categoryItems
@@ -59,9 +58,6 @@ class CartItems {
     'Beverages': [
       {'name': 'Cavins', 'price': 40.0, 'image': 'assets/img/Cavins.jpeg'},
       {'name': 'Frooti', 'price': 40.0, 'image': 'assets/img/Frooti.jpeg'},
-    ],
-    'IceCreams': [
-      {'name': 'Icecream', 'price': 20.0, 'image': 'assets/img/Icecream.jpeg'},
     ],
   };
 }

@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:rmart/Widgets/popular_items_widget.dart';
-import 'package:rmart/models/cart_items.dart'; // Import the CartItems class
+import 'package:firebase_database/firebase_database.dart';
+// import 'package:rmart/Widgets/popular_items_widget.dart';
+import 'package:rmart/add_to_cart.dart';
 
 class Categories extends StatefulWidget {
   final String category;
@@ -13,75 +15,104 @@ class Categories extends StatefulWidget {
 
 class _CategoriesState extends State<Categories> {
   late final PageController _pageController;
-  String _selectedCategory = 'All';
+  late DatabaseReference _databaseRef;
+  Map<String, List<Map<String, dynamic>>> _categoryItems = {};
+  List<String> _categories = [];
+  late StreamSubscription<DatabaseEvent> _streamSubscription;
+  String _selectedCategory = '';
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(
-      initialPage: _getPageIndexFromCategory(widget.category),
-    );
+    _databaseRef = FirebaseDatabase.instance.ref();
+    _pageController = PageController();
     _pageController.addListener(_onPageChanged);
-    _selectedCategory = widget.category;
+    _activateListeners();
   }
 
   @override
   void dispose() {
+    _streamSubscription.cancel();
     _pageController.removeListener(_onPageChanged);
     _pageController.dispose();
     super.dispose();
   }
 
-  void _onPageChanged() {
-    final pageIndex = _pageController.page?.round() ?? 0;
-    setState(() {
-      _selectedCategory = _getCategoryFromIndex(pageIndex);
+  void _activateListeners() {
+    _streamSubscription = _databaseRef
+        .child('AdminDatabase/Rec Cafe/Categories/')
+        .onValue
+        .listen((event) {
+      final data = event.snapshot.value;
+      print('Data received: $data');
+
+      if (data == null || data is! Map) {
+        print('Error: Data is null or not a Map');
+        return;
+      }
+
+      final Map<String, List<Map<String, dynamic>>> categoryItems = {};
+      final List<String> categories = [];
+
+      (data as Map<dynamic, dynamic>).forEach((key, value) {
+        final categoryName = key as String;
+        categories.add(categoryName);
+
+        final items = (value as Map<dynamic, dynamic>).entries.map((e) {
+          final itemData = e.value as Map<dynamic, dynamic>;
+          return {
+            'name': itemData['name'],
+            'price': itemData['price'],
+            'image': itemData['image'],
+            'quantity': itemData['quantity'],
+          };
+        }).toList();
+
+        categoryItems[categoryName] = items;
+      });
+
+      setState(() {
+        _categoryItems = categoryItems;
+        _categories = categories;
+        _selectedCategory = widget.category.isEmpty ? categories.first : widget.category;
+        _pageController.jumpToPage(_getPageIndexFromCategory(_selectedCategory));
+      });
     });
   }
 
+  void _onPageChanged() {
+    final pageIndex = _pageController.page?.round() ?? 0;
+    if (_categories.isNotEmpty) {
+      final newCategory = _getCategoryFromIndex(pageIndex);
+      if (_selectedCategory != newCategory) {
+        setState(() {
+          _selectedCategory = newCategory;
+        });
+      }
+    }
+  }
+
   void _navigateToPage(int pageIndex, String category) {
+    setState(() {
+      _selectedCategory = category;
+    });
     _pageController.animateToPage(
       pageIndex,
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
-    setState(() {
-      _selectedCategory = category;
-    });
   }
 
   String _getCategoryFromIndex(int index) {
-    switch (index) {
-      case 1:
-        return 'BreakFast';
-      case 2:
-        return 'Lunch';
-      case 3:
-        return 'Snacks';
-      case 4:
-        return 'Beverages';
-      case 5:
-        return 'IceCreams';
-      default:
-        return 'All';
+    if (index >= 0 && index < _categories.length) {
+      return _categories[index];
     }
+    return 'All';
   }
 
   int _getPageIndexFromCategory(String category) {
-    switch (category) {
-      case 'BreakFast':
-        return 1;
-      case 'Lunch':
-        return 2;
-      case 'Snacks':
-        return 3;
-      case 'Beverages':
-        return 4;
-      case 'IceCreams':
-        return 5;
-      default:
-        return 0;
-    }
+    final index = _categories.indexOf(category);
+    return index != -1 ? index : 0;
   }
 
   @override
@@ -106,18 +137,25 @@ class _CategoriesState extends State<Categories> {
                 scrollDirection: Axis.horizontal,
                 child: Padding(
                   padding: const EdgeInsets.only(left: 0, top: 8),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        _buildCategoryButton('All', 0),
-                        _buildCategoryButton('BreakFast', 1),
-                        _buildCategoryButton('Lunch', 2),
-                        _buildCategoryButton('Snacks', 3),
-                        _buildCategoryButton('Beverages', 4),
-                        _buildCategoryButton('IceCreams', 5),
-                      ],
-                    ),
+                  child: Row(
+                    children: _categories.map((category) {
+                      final isSelected = _selectedCategory == category;
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: ElevatedButton(
+                          onPressed: () => _navigateToPage(_categories.indexOf(category), category),
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: isSelected ? Colors.white : Colors.deepPurple,
+                            backgroundColor: isSelected ? Colors.deepPurple : Colors.white,
+                            elevation: 5,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                          ),
+                          child: Text(category),
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ),
               ),
@@ -132,48 +170,18 @@ class _CategoriesState extends State<Categories> {
       ),
       body: PageView.builder(
         controller: _pageController,
-        itemCount: 6,
+        itemCount: _categories.length,
         itemBuilder: (context, index) {
-          return _buildFoodGrid(_getCategoryFromIndex(index));
+          return _buildFoodGrid(_categories[index]);
         },
       ),
     );
   }
 
-  Widget _buildCategoryButton(String title, int pageIndex) {
-    bool isSelected = _selectedCategory == title;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: ElevatedButton(
-        onPressed: () => _navigateToPage(pageIndex, title),
-        style: ElevatedButton.styleFrom(
-          foregroundColor: isSelected ? Colors.white : Colors.deepPurple,
-          backgroundColor: isSelected ? Colors.deepPurple : Colors.white,
-          elevation: 5,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-        ),
-        child: Text(title),
-      ),
-    );
-  }
-
   Widget _buildFoodGrid(String category) {
-    final cartItems = CartItems();
-
-    List<Map<String, dynamic>> items;
-    if (category == 'All') {
-      items = [
-        ...cartItems.categoryItems['BreakFast']!,
-        ...cartItems.categoryItems['Lunch']!,
-        ...cartItems.categoryItems['Snacks']!,
-        ...cartItems.categoryItems['Beverages']!,
-        ...cartItems.categoryItems['IceCreams']!,
-      ];
-    } else {
-      items = cartItems.categoryItems[category] ?? [];
-    }
+    final items = category == 'All'
+        ? _categoryItems.values.expand((e) => e).toList()
+        : _categoryItems[category] ?? [];
 
     return GridView.builder(
       padding: const EdgeInsets.all(20),
@@ -219,14 +227,6 @@ class _CategoriesState extends State<Categories> {
                 ),
                 Row(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                      child: Image.asset(
-                        "assets/img/vegan.png",
-                        height: 25,
-                        width: 25,
-                      ),
-                    ),
                     Text(
                       " $itemName",
                       style: const TextStyle(
@@ -253,7 +253,8 @@ class _CategoriesState extends State<Categories> {
                     const SizedBox(width: 16),
                     Align(
                       alignment: Alignment.centerLeft,
-                      child: AddToCartButton(foodItem: itemName),
+                      // child: AddToCartButton(foodItem: itemName),
+                      child: AddToCartButton(foodItem: item), // Sends item with details.
                     ),
                   ],
                 ),
@@ -264,6 +265,4 @@ class _CategoriesState extends State<Categories> {
       },
     );
   }
-
-
 }

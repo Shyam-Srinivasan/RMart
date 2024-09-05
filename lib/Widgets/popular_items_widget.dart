@@ -1,114 +1,63 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:rmart/models/cart_items.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:rmart/add_to_cart.dart'; // Import the add_to_cart.dart
 
-class AddToCartButton extends StatefulWidget {
-  final String foodItem;
-  AddToCartButton({required this.foodItem});
-
+class PopularItemsWidget extends StatefulWidget {
   @override
-  _AddToCartButtonState createState() => _AddToCartButtonState();
+  _PopularItemsWidgetState createState() => _PopularItemsWidgetState();
 }
 
-class _AddToCartButtonState extends State<AddToCartButton> {
-  late CartItem cartItem;
-  bool _isClicked = false;
+class _PopularItemsWidgetState extends State<PopularItemsWidget> {
+  List<Map<String, dynamic>> popularItems = [];
+  final DatabaseReference _database = FirebaseDatabase.instance.ref();
+  late StreamSubscription<DatabaseEvent> _streamSubscription;
 
   @override
   void initState() {
     super.initState();
-    cartItem = CartItems().cart_items_list[widget.foodItem]!;
-    _isClicked = cartItem.quantity > 0;
+    _activateListeners();
   }
 
-  void _handleClick() {
-    setState(() {
-      if (cartItem.quantity == 0) {
-        cartItem.quantity = 1;
-        _isClicked = true;
-      } else {
-        cartItem.quantity = 0;
-        _isClicked = false;
-      }
-      print("Map: ${CartItems().cart_items_list[widget.foodItem]}");
+  @override
+  void dispose() {
+    _streamSubscription.cancel();
+    super.dispose();
+  }
+
+  void _activateListeners() {
+    _streamSubscription = _database
+        .child('AdminDatabase/Rec Cafe/Popular')
+        .onValue
+        .listen((event) {
+      final data = event.snapshot.value as Map<dynamic, dynamic>;
+      final List<Map<String, dynamic>> items = [];
+      data.forEach((key, value) {
+        items.add({
+          'name': value['name'] ?? key,
+          'price': value['price'] ?? 0.0,
+          'quantity': value['quantity'] ?? 0,
+          'image': value['image'] ?? 'assets/img/default.jpeg', // Provide a default image if not available
+        });
+      });
+      setState(() {
+        popularItems = items;
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 8.0, right:5),
-      child: AnimatedContainer(
-        duration: Duration(milliseconds: 300),
-        width: 100,
-        height: 33,
-        decoration: BoxDecoration(
-          color: Colors.deepPurple,
-          borderRadius: BorderRadius.circular(15),
-        ),
-        child: cartItem.quantity == 0
-            ? TextButton(
-          onPressed: _handleClick,
-          style: TextButton.styleFrom(
-            foregroundColor: Colors.white,
-            padding: EdgeInsets.zero,
-          ),
-          child: Text('Add', style: TextStyle(fontSize: 16)),
-        )
-            : Row(
-          children: [
-            Flexible(
-              child: IconButton(
-                onPressed: () {
-                  setState(() {
-                    if (cartItem.quantity > 0) {
-                      cartItem.quantity--;
-                      if (cartItem.quantity == 0) {
-                        _isClicked = false;
-                      }
-                    }
-                    print("Map: ${CartItems().cart_items_list}");
-                  });
-                },
-                icon: Icon(Icons.remove, color: Colors.white, size: 24),
-                padding: EdgeInsets.zero,
-              ),
-            ),
-            Text(
-              '${cartItem.quantity}',
-              style: TextStyle(color: Colors.white, fontSize: 16),
-            ),
-            Flexible(
-              child: IconButton(
-                onPressed: () {
-                  setState(() {
-                    cartItem.quantity++;
-                    print("Map: ${CartItems().cart_items_list}");
-                  });
-                },
-                icon: Icon(Icons.add, color: Colors.white, size: 24),
-                padding: EdgeInsets.zero,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class PopularItemsWidget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final cartItems = CartItems().cart_items_list;
-
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
         child: Row(
-          children: cartItems.entries.map((entry) {
-            final foodName = entry.key;
-            final cartItem = entry.value;
+          children: popularItems.map((item) {
+            final imagePath = item['image'];
+            final foodName = item['name'];
+            final price = item['price'];
+            final quantity = item['quantity'];
 
             return Padding(
               padding: EdgeInsets.symmetric(horizontal: 7),
@@ -134,7 +83,7 @@ class PopularItemsWidget extends StatelessWidget {
                       Expanded(
                         child: Container(
                           child: Image.asset(
-                            "assets/img/${foodName.replaceAll(' ', '')}.jpeg", // Assuming the image names are based on the food names
+                            imagePath,
                             height: 150,
                             width: 200,
                             fit: BoxFit.cover,
@@ -159,7 +108,7 @@ class PopularItemsWidget extends StatelessWidget {
                           Padding(
                             padding: EdgeInsets.only(bottom: 10, left: 10),
                             child: Text(
-                              "₹${cartItem.price.toInt()}",
+                              "₹${price.toInt()}",
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -170,7 +119,14 @@ class PopularItemsWidget extends StatelessWidget {
                           Expanded(
                             child: Align(
                               alignment: Alignment.centerRight,
-                              child: AddToCartButton(foodItem: foodName),
+                              child: AddToCartButton(
+                                foodItem: {
+                                  'name': foodName,
+                                  'price': price,
+                                  'quantity': quantity,
+                                  'image': imagePath,
+                                },
+                              ),
                             ),
                           ),
                         ],

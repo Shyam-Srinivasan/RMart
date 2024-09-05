@@ -1,6 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:rmart/models/cart_items.dart';
-import 'package:rmart/Widgets/popular_items_widget.dart';// Make sure to import the AddToCartButton
+import 'package:firebase_database/firebase_database.dart';
+import 'package:rmart/add_to_cart.dart'; // Ensure the import is correct
 
 class SearchPage extends StatefulWidget {
   @override
@@ -9,22 +10,50 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   String _query = '';
-  final List<String> _items = [
-    'Sambar Rice',
-    'Idli',
-    'Pongal',
-    'Choola Poori',
-    'Chapati',
-    'Dosa',
-    'Veg Biriyani',
-    'Veg Noodles',
-    'Veg Rice',
-    'Veg Pasta',
-    'Egg Noodles',
-    'Egg Rice',
-    'Egg Pasta',
-  ];
-  final List<String> _recentItems = ['Sambar Rice', 'Chapati'];
+  final DatabaseReference _database = FirebaseDatabase.instance.ref();
+  List<Map<String, dynamic>> _items = [];
+  late StreamSubscription<DatabaseEvent> _streamSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
+
+  @override
+  void dispose() {
+    _streamSubscription.cancel();
+    super.dispose();
+  }
+
+  void _fetchData() {
+    _streamSubscription = _database
+        .child('AdminDatabase/Rec Cafe/Categories')
+        .onValue
+        .listen((event) {
+      final data = event.snapshot.value as Map<dynamic, dynamic>;
+      final List<Map<String, dynamic>> items = [];
+
+      data.forEach((categoryKey, categoryValue) {
+        final categoryMap = categoryValue as Map<dynamic, dynamic>;
+
+        categoryMap.forEach((itemKey, itemValue) {
+          final item = {
+            'name': itemValue['name'] ?? itemKey,
+            'price': itemValue['price'] ?? 0.0,
+            'quantity': itemValue['quantity'] ?? 0,
+            'image': itemValue['image'] ?? 'assets/img/default.jpeg', // Default image if not available
+          };
+
+          items.add(item);
+        });
+      });
+
+      setState(() {
+        _items = items;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,8 +124,8 @@ class _SearchPageState extends State<SearchPage> {
 
   List<Widget> _buildSuggestions() {
     final suggestions = _query.isEmpty
-        ? _recentItems
-        : _items.where((item) => item.toLowerCase().contains(_query.toLowerCase())).toList();
+        ? _items
+        : _items.where((item) => item['name'].toLowerCase().contains(_query.toLowerCase())).toList();
 
     return suggestions.map((item) {
       return Padding(
@@ -120,7 +149,7 @@ class _SearchPageState extends State<SearchPage> {
             children: [
               Expanded(
                 child: Image.asset(
-                  "assets/img/${item.replaceAll(' ', '')}.jpeg", // Assuming image names are based on food names
+                  item['image'], // Load image from URL
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
@@ -131,13 +160,20 @@ class _SearchPageState extends State<SearchPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      item,
+                      item['name'],
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    AddToCartButton(foodItem: item), // Add the AddToCartButton here
+                    AddToCartButton(
+                      foodItem: {
+                        'name': item['name'],
+                        'price': item['price'],
+                        'quantity': item['quantity'],
+                        'image': item['image'],
+                      },
+                    ), // Add the AddToCartButton here
                   ],
                 ),
               ),

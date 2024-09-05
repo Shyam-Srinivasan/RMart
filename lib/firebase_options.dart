@@ -31,7 +31,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
+              'you can reconfigure this by running the FlutterFire CLI again.',
         );
       default:
         throw UnsupportedError(
@@ -46,6 +46,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '507312397854',
     projectId: 'rec-mart',
     authDomain: 'rec-mart.firebaseapp.com',
+    databaseURL: 'https://rec-mart-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'rec-mart.appspot.com',
     measurementId: 'G-T3NKMGW8PS',
   );
@@ -55,6 +56,7 @@ class DefaultFirebaseOptions {
     appId: '1:507312397854:android:2001ca843a363b400c580f',
     messagingSenderId: '507312397854',
     projectId: 'rec-mart',
+    databaseURL: 'https://rec-mart-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'rec-mart.appspot.com',
   );
 
@@ -63,7 +65,10 @@ class DefaultFirebaseOptions {
     appId: '1:507312397854:ios:0552116ffa5f1e7a0c580f',
     messagingSenderId: '507312397854',
     projectId: 'rec-mart',
+    databaseURL: 'https://rec-mart-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'rec-mart.appspot.com',
+    androidClientId: '507312397854-3uo5vmoqovef5sbjd9fug0eterqh5poi.apps.googleusercontent.com',
+    iosClientId: '507312397854-2dvq85obqi8etk5gi4hd9esu0ti1m2h6.apps.googleusercontent.com',
     iosBundleId: 'com.example.rmart',
   );
 
@@ -72,7 +77,10 @@ class DefaultFirebaseOptions {
     appId: '1:507312397854:ios:0552116ffa5f1e7a0c580f',
     messagingSenderId: '507312397854',
     projectId: 'rec-mart',
+    databaseURL: 'https://rec-mart-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'rec-mart.appspot.com',
+    androidClientId: '507312397854-3uo5vmoqovef5sbjd9fug0eterqh5poi.apps.googleusercontent.com',
+    iosClientId: '507312397854-2dvq85obqi8etk5gi4hd9esu0ti1m2h6.apps.googleusercontent.com',
     iosBundleId: 'com.example.rmart',
   );
 
@@ -82,7 +90,9 @@ class DefaultFirebaseOptions {
     messagingSenderId: '507312397854',
     projectId: 'rec-mart',
     authDomain: 'rec-mart.firebaseapp.com',
+    databaseURL: 'https://rec-mart-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'rec-mart.appspot.com',
     measurementId: 'G-LWWSWDX7P7',
   );
+
 }

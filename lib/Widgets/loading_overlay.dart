@@ -3,23 +3,18 @@ import 'package:lottie/lottie.dart';
 
 class LoadingOverlay extends StatelessWidget {
   final bool isLoading;
-  final Widget child;
 
-  LoadingOverlay({required this.isLoading, required this.child});
+  const LoadingOverlay({Key? key, required this.isLoading}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        child,
-        if (isLoading)
-          Container(
-            color: Colors.black.withOpacity(0.5),
-            child: Center(
-              child: Lottie.asset('assets/lottie/DinnerLoading.json'), // Path to your Lottie file
-            ),
-          ),
-      ],
-    );
+    return isLoading
+        ? Container(
+      color: Colors.white.withOpacity(0.8),
+      child: Center(
+        child: Lottie.asset('assets/img/DinnerLoading.json'), // Your loading animation
+      ),
+    )
+        : SizedBox.shrink();
   }
 }
