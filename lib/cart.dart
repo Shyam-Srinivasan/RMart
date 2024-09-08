@@ -1,9 +1,11 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:rmart/qr_code_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CartPage extends StatefulWidget {
   @override
@@ -13,6 +15,9 @@ class CartPage extends StatefulWidget {
 class _CartPageState extends State<CartPage> {
   late DatabaseReference _databaseRef;
   Map<String, Map<String, dynamic>> _cartItems = {};
+  late StreamSubscription<DatabaseEvent> _cartStreamSubscription;
+  late StreamSubscription<DatabaseEvent> _adminStreamSubscription;
+  Map<String, dynamic> _adminData = {};
   late StreamSubscription<DatabaseEvent> _streamSubscription;
   bool _isLoading = true;
 
@@ -21,17 +26,40 @@ class _CartPageState extends State<CartPage> {
     super.initState();
     _databaseRef = FirebaseDatabase.instance.ref();
     _activateListeners();
+    _fetchAdminData();
+  }
+
+  Future<String?> getSelectedShop() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('selectedShop');
+  }
+
+
+  String? getCurrentUserId() {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      return user.uid;
+    } else {
+      print('No user is signed in');
+      return null; // Handle the case when no user is signed in
+    }
   }
 
   void _activateListeners() {
-    _streamSubscription = _databaseRef
-        .child('UserDatabase/UserID1/CartItems/')
+    String? userId = getCurrentUserId(); // Get the userId
+    _cartStreamSubscription = _databaseRef
+        .child('UserDatabase/$userId/CartItems/')
         .onValue
         .listen((event) {
       final data = event.snapshot.value;
 
       if (data == null || data is! Map) {
         print('Error: Data is null or not a Map');
+        // Update the state to show an empty cart UI
+        setState(() {
+          _cartItems = {}; // Clear the cart
+          _isLoading = false; // Stop loading
+        });
         return;
       }
 
@@ -44,18 +72,73 @@ class _CartPageState extends State<CartPage> {
             ),
           ),
         );
-        _isLoading = false;
+        _isLoading = false; // Stop loading
       });
     });
   }
 
+  void _activateAdminListener() async {
+   String? shopName = await getSelectedShop();
+   _adminStreamSubscription = _databaseRef
+       .child('AdminDatabase/$shopName/Categories')
+       .onValue
+       .listen((event) {
+     final data = event.snapshot.value;
+     if (data != null && data is Map) {
+       setState(() {
+         _adminData = Map<String, dynamic>.from(data as Map);
+       });
+     } else {
+       setState(() {
+         _adminData = {};
+       });
+     }
+   });
+}
+ Future<void> _fetchAdminData() async {
+   String? shopName = await getSelectedShop();
+   if (shopName != null) {
+     DatabaseEvent event = await _databaseRef.child('AdminDatabase/$shopName/Categories').once();
+     if (event.snapshot.value != null && event.snapshot.value is Map) {
+       setState(() {
+         _adminData = Map<String, dynamic>.from(event.snapshot.value as Map);
+       });
+       _activateAdminListener(); // Start listening to admin data changes
+     } else {
+       setState(() {
+         _adminData = {};
+       });
+      }
+    }
+  }
+
+
   @override
   void dispose() {
-    _streamSubscription.cancel();
+    _cartStreamSubscription.cancel();
+    _adminStreamSubscription.cancel();
     super.dispose();
   }
 
-  @override
+  void _showOutOfStockAlert() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Out of Stock'),
+        content: Text('Some items in your cart are out of stock. Please remove them to proceed.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     // Filter only items with quantity > 0
@@ -92,8 +175,9 @@ class _CartPageState extends State<CartPage> {
     final isCartEmpty = filteredItems.isEmpty;
 
     void _updateItemInDatabase(String itemName, Map<String, dynamic> itemDetails) {
+      String? userId = getCurrentUserId(); // Get the userId
       // Assuming you have a reference to your Firebase Realtime Database
-      DatabaseReference ref = FirebaseDatabase.instance.ref('UserDatabase/UserID1/CartItems/$itemName');
+      DatabaseReference ref = FirebaseDatabase.instance.ref('UserDatabase/$userId/CartItems/$itemName');
 
       // Update item in database
       ref.update({
@@ -102,14 +186,37 @@ class _CartPageState extends State<CartPage> {
     }
 
     void _removeItemFromCart(String itemName) {
+      String? userId = getCurrentUserId(); // Get the userId
       // Remove item from local cart
       setState(() {
         _cartItems.remove(itemName);
       });
 
       // Also remove item from database
-      DatabaseReference ref = FirebaseDatabase.instance.ref('UserDatabase/UserID1/CartItems/$itemName');
+      DatabaseReference ref = FirebaseDatabase.instance.ref('UserDatabase/$userId/CartItems/$itemName');
       ref.remove();
+    }
+
+    bool _isOutOfStock(String itemName) {
+      for (var category in _adminData.values) {
+        if (category[itemName] != null && category[itemName]['quantity'] == 0) {
+          return true; // Item is out of stock
+        }
+      }
+      return false; // Item is in stock
+    }
+
+    bool hasOutOfStockItems() {
+      return filteredItems.any((entry) => _isOutOfStock(entry.key));
+    }
+
+
+
+    void _removeOutOfStockItems() {
+      final outOfStockItems = filteredItems.where((entry) => _isOutOfStock(entry.key)).toList();
+      for (var entry in outOfStockItems) {
+        _removeItemFromCart(entry.key);
+      }
     }
 
 
@@ -127,14 +234,14 @@ class _CartPageState extends State<CartPage> {
         ),
       ),
       body: _isLoading
-        ? Center(
+          ? Center(
         child: Lottie.asset(
           'assets/img/DinnerLoading.json',  // Assuming this is your loading animation file
           width: 200,
           height: 200,
         ),
       )
-      :isCartEmpty
+          :isCartEmpty
           ? Center(
         child: Padding(
           padding: const EdgeInsets.only(bottom: 40),
@@ -167,6 +274,7 @@ class _CartPageState extends State<CartPage> {
           final itemDetails = filteredItems[index].value;
 
           final imagePath = 'assets/img/${itemName.replaceAll(' ', '')}.jpeg';
+          final isOutOfStock = _isOutOfStock(itemName);
 
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
@@ -237,8 +345,31 @@ class _CartPageState extends State<CartPage> {
                       ],
                     ),
                   ),
-                  // Quantity controls
-                  Row(
+                  isOutOfStock
+                      ? Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 0),
+                        child: Text(
+                          'Out of Stock',
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _removeItemFromCart(itemName);
+                          });
+                        },
+                        icon: Icon(Icons.delete, color: Colors.red),
+                      ),
+                    ],
+                  )
+                      :Row(
                     children: [
                       IconButton(
                         onPressed: () {
@@ -298,7 +429,8 @@ class _CartPageState extends State<CartPage> {
           );
         },
       ),
-      bottomNavigationBar: BottomAppBar(
+      bottomNavigationBar: filteredItems.isNotEmpty
+          ?BottomAppBar(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
           child: Row(
@@ -306,6 +438,7 @@ class _CartPageState extends State<CartPage> {
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                // mainAxisSize: MainAxisSize.min,
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top: 5),
@@ -331,11 +464,22 @@ class _CartPageState extends State<CartPage> {
               Padding(
                 padding: const EdgeInsets.only(left: 10),
                 child: ElevatedButton(
-                  onPressed: isCartEmpty ? null : () {
+                  onPressed: hasOutOfStockItems()
+                      ? () {
+                    // Show alert if there are out-of-stock items
+                    _showOutOfStockAlert();
+                  }
+                      : (isCartEmpty || totalAmount == 0)
+                      ? null
+                      : () {
+                    // Navigate to UpiPaymentScreen if no out-of-stock items
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => QrCodePage(orderedItems: orderedItems, totalAmount: totalAmount),
+                        builder: (context) => QrCodePage(
+                          totalAmount: totalAmount,
+                          orderedItems: orderedItems,
+                        ),
                       ),
                     );
                   },
@@ -353,7 +497,8 @@ class _CartPageState extends State<CartPage> {
             ],
           ),
         ),
-      ),
+      )
+          : SizedBox.shrink(),
     );
   }
 

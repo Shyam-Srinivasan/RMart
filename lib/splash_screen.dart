@@ -1,7 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:rmart/login_screen.dart';
-import 'package:rmart/sign_in_page.dart';
+import 'package:video_player/video_player.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -10,29 +10,45 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen> {
+  late VideoPlayerController _controller;
   @override
   void initState() {
     super.initState();
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
-    Future.delayed(const Duration(seconds: 5), () {
-      Navigator.of(context).pushReplacement(
-        // TODO Splash Screen to LoginPage()
-        // MaterialPageRoute(builder: (_) => LoginPage()),
-        // TODO Remove this line
-        MaterialPageRoute(builder: (_)=>SignIn())
-      );
-      // TODO Remove this line
-      /*Navigator.of(context).pushNamed('/home', arguments: {
-        'name': 'Shyam Srinivasan',
-        'email': '220701508@rajalakshmi.edu'
-      });*/
+    _controller = VideoPlayerController.asset(
+      'assets/img/Log.mp4',
+    )
+    ..initialize().then((_){
+      setState(() {});
+    })
+    ..setVolume(0.0);
+    _playVideo();
 
-    });
+  }
+
+  void _checkAuthentication() {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null && user.emailVerified) {
+      // If user is authenticated and email is verified, navigate to home page
+      Navigator.of(context).pushReplacementNamed('/option');
+    } else {
+      // If user is not authenticated, redirect to SignIn page
+      Navigator.of(context).pushReplacementNamed('/signIn');
+    }
+  }
+
+  void _playVideo() async{
+    _controller.play();
+    await Future.delayed(const Duration(seconds: 4));
+    // Navigator.pushNamed(context, '/option');
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+    _checkAuthentication();
+
   }
 
   @override
-  void dispose() {
+  void dispose(){
+    _controller.dispose();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: SystemUiOverlay.values);
     super.dispose();
   }
@@ -40,35 +56,16 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.only(left: 120, bottom: 80),
-          child: Center(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Image.asset(
-                  "assets/img/Logo.jpeg",
-                  width: 80, // Adjust the size as needed
-                  height: 80,
-                ),
-                const SizedBox(width: 10), // Space between the logo and text
-                const Expanded(
-                  child: Text(
-                    'Mart',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 35,
-                      fontFamily: 'Montserrat',
-                      fontWeight: FontWeight.w900,
-                    ),
-                    overflow: TextOverflow.ellipsis, // Handle overflow
-                  ),
-                ),
-              ],
-            ),
+        child: _controller.value.isInitialized
+        ? AspectRatio(
+          aspectRatio: _controller.value.aspectRatio,
+          child: VideoPlayer(
+            _controller,
           ),
-        ),
+        )
+        : Container(),
       ),
     );
   }

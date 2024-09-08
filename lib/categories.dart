@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 // import 'package:rmart/Widgets/popular_items_widget.dart';
 import 'package:rmart/add_to_cart.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 
 class Categories extends StatefulWidget {
   final String category;
@@ -14,6 +16,7 @@ class Categories extends StatefulWidget {
 }
 
 class _CategoriesState extends State<Categories> {
+  bool _isLoading = true;
   late final PageController _pageController;
   late DatabaseReference _databaseRef;
   Map<String, List<Map<String, dynamic>>> _categoryItems = {};
@@ -30,6 +33,32 @@ class _CategoriesState extends State<Categories> {
     _activateListeners();
   }
 
+  Future<String?> getSelectedShop() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('selectedShop');
+  }
+
+  Future<void> _loadData() async {
+    // Simulate a delay for loading animation
+    await Future.delayed(Duration(milliseconds: 500));
+    await getSelectedShop(); // Refresh shop name
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  Future<void> _handleRefresh() async{
+    setState(() {
+      _isLoading = true;
+    });
+    await _loadData();
+    return await Future.delayed(Duration(milliseconds: 800));
+    setState(() {
+      false;
+    });
+  }
+
   @override
   void dispose() {
     _streamSubscription.cancel();
@@ -38,9 +67,10 @@ class _CategoriesState extends State<Categories> {
     super.dispose();
   }
 
-  void _activateListeners() {
+  void _activateListeners() async{
+    String? shopName = await getSelectedShop();
     _streamSubscription = _databaseRef
-        .child('AdminDatabase/Rec Cafe/Categories/')
+        .child('AdminDatabase/$shopName/Categories/')
         .onValue
         .listen((event) {
       final data = event.snapshot.value;
@@ -72,6 +102,7 @@ class _CategoriesState extends State<Categories> {
       });
 
       setState(() {
+        _isLoading = false;
         _categoryItems = categoryItems;
         _categories = categories;
         _selectedCategory = widget.category.isEmpty ? categories.first : widget.category;
@@ -168,20 +199,31 @@ class _CategoriesState extends State<Categories> {
           ],
         ),
       ),
-      body: PageView.builder(
-        controller: _pageController,
-        itemCount: _categories.length,
-        itemBuilder: (context, index) {
-          return _buildFoodGrid(_categories[index]);
-        },
+      body: LiquidPullToRefresh(
+        onRefresh: _handleRefresh,
+        color:Colors.deepPurple,
+        backgroundColor: Colors.deepPurple[200],
+        animSpeedFactor: 2,
+        springAnimationDurationInMilliseconds: 500,
+
+        showChildOpacityTransition: false,
+
+        child: PageView.builder(
+          controller: _pageController,
+          itemCount: _categories.length,
+          itemBuilder: (context, index) {
+            return _buildFoodGrid(_categories[index]);
+          },
+        ),
       ),
     );
   }
 
   Widget _buildFoodGrid(String category) {
+    // Get the items based on the selected category, filter by quantity > 0
     final items = category == 'All'
         ? _categoryItems.values.expand((e) => e).toList()
-        : _categoryItems[category] ?? [];
+        : _categoryItems[category]?.toList() ?? [];
 
     return GridView.builder(
       padding: const EdgeInsets.all(20),
@@ -196,6 +238,7 @@ class _CategoriesState extends State<Categories> {
         final itemName = item['name'];
         final itemPrice = item['price'];
         final itemImage = item['image'];
+        final itemQuantity = item['quantity'];
 
         return Container(
           width: 170,
@@ -253,8 +296,19 @@ class _CategoriesState extends State<Categories> {
                     const SizedBox(width: 16),
                     Align(
                       alignment: Alignment.centerLeft,
-                      // child: AddToCartButton(foodItem: itemName),
-                      child: AddToCartButton(foodItem: item), // Sends item with details.
+                      child: itemQuantity > 0
+                          ? AddToCartButton(foodItem: item) // Show Add to Cart button if in stock
+                          : const Padding(
+                        padding: EdgeInsets.only(bottom: 10),
+                        child: Text(
+                          'Out of Stock',
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -265,4 +319,5 @@ class _CategoriesState extends State<Categories> {
       },
     );
   }
+
 }

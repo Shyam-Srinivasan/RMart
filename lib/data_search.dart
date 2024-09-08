@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:rmart/add_to_cart.dart'; // Ensure the import is correct
+import 'package:rmart/add_to_cart.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Ensure the import is correct
 
 class SearchPage extends StatefulWidget {
   @override
@@ -20,15 +21,21 @@ class _SearchPageState extends State<SearchPage> {
     _fetchData();
   }
 
+  Future<String?> getSelectedShop() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('selectedShop');
+  }
+
   @override
   void dispose() {
     _streamSubscription.cancel();
     super.dispose();
   }
 
-  void _fetchData() {
+  void _fetchData() async{
+    String? shopName = await getSelectedShop();
     _streamSubscription = _database
-        .child('AdminDatabase/Rec Cafe/Categories')
+        .child('AdminDatabase/$shopName/Categories')
         .onValue
         .listen((event) {
       final data = event.snapshot.value as Map<dynamic, dynamic>;

@@ -46,12 +46,25 @@ class _OrdersPageState extends State<OrdersPage> {
         title: Text('Orders'),
         backgroundColor: Colors.white,
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(15.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          preferredSize: Size.fromHeight(50.0), // Adjust height to fit both tab indicators and divider
+          child: Column(
             children: [
-              _buildTabIndicator('Purchased', 0),
-              _buildTabIndicator('Pending', 1),
+              const Divider(
+                height: 4.0,
+                thickness: 1,
+                color: Color(0x61693BB8),
+              ),
+              SizedBox(
+                height: 15,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildTabIndicator('Purchased', 0),
+                  _buildTabIndicator('Pending', 1),
+                ],
+              ),
+
             ],
           ),
         ),

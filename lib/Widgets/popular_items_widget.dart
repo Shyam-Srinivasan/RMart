@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'package:rmart/shimmer_effect.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:rmart/add_to_cart.dart'; // Import the add_to_cart.dart
+import 'package:rmart/add_to_cart.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Import the add_to_cart.dart
 
 class PopularItemsWidget extends StatefulWidget {
   @override
@@ -12,11 +14,18 @@ class _PopularItemsWidgetState extends State<PopularItemsWidget> {
   List<Map<String, dynamic>> popularItems = [];
   final DatabaseReference _database = FirebaseDatabase.instance.ref();
   late StreamSubscription<DatabaseEvent> _streamSubscription;
+  bool _isLoading = true;
+
 
   @override
   void initState() {
     super.initState();
     _activateListeners();
+  }
+
+  Future<String?> getSelectedShop() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('selectedShop');
   }
 
   @override
@@ -25,9 +34,10 @@ class _PopularItemsWidgetState extends State<PopularItemsWidget> {
     super.dispose();
   }
 
-  void _activateListeners() {
+  void _activateListeners() async{
+    String? shopName = await getSelectedShop();
     _streamSubscription = _database
-        .child('AdminDatabase/Rec Cafe/Popular')
+        .child('AdminDatabase/$shopName/Popular')
         .onValue
         .listen((event) {
       final data = event.snapshot.value as Map<dynamic, dynamic>;
@@ -42,6 +52,7 @@ class _PopularItemsWidgetState extends State<PopularItemsWidget> {
       });
       setState(() {
         popularItems = items;
+        _isLoading = false;
       });
     });
   }
@@ -52,7 +63,9 @@ class _PopularItemsWidgetState extends State<PopularItemsWidget> {
       scrollDirection: Axis.horizontal,
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-        child: Row(
+        child: _isLoading
+          ? ShimmerEffect(width: 170, height: 225)
+        : Row(
           children: popularItems.map((item) {
             final imagePath = item['image'];
             final foodName = item['name'];

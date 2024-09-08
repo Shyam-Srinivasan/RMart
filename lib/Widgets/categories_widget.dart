@@ -1,9 +1,10 @@
 import 'dart:async';
-
+import 'package:rmart/shimmer_effect.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CategoriesWidget extends StatefulWidget {
   final Function(String) onCategorySelected;
@@ -18,6 +19,7 @@ class _CategoriesWidgetState extends State<CategoriesWidget> {
   List<String> categoryNames = [];
   final _database = FirebaseDatabase.instance.ref();
   late StreamSubscription<DatabaseEvent> _streamSubscription;
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -25,15 +27,23 @@ class _CategoriesWidgetState extends State<CategoriesWidget> {
     _activateListeners();
   }
 
+  Future<String?> getSelectedShop() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('selectedShop');
+  }
+
+
+
   @override
   void dispose() {
     _streamSubscription.cancel();
     super.dispose();
   }
 
-  void _activateListeners() {
+  void _activateListeners() async{
+    String? shopName = await getSelectedShop();
     _streamSubscription = _database
-        .child('AdminDatabase/Rec Cafe/Categories/')
+        .child('AdminDatabase/$shopName/Categories/')
         .onValue
         .listen((event) {
       final data = event.snapshot.value as Map<dynamic, dynamic>;
@@ -43,6 +53,7 @@ class _CategoriesWidgetState extends State<CategoriesWidget> {
       });
       setState(() {
         categoryNames = categories;
+        _isLoading = false;
       });
     });
   }
@@ -53,7 +64,9 @@ class _CategoriesWidgetState extends State<CategoriesWidget> {
       scrollDirection: Axis.horizontal,
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 15, horizontal: 5),
-        child: Row(
+        child: _isLoading
+          ? ShimmerEffect(width: 170, height: 225)
+        : Row(
           children: [
             // images are used from local
             for (int i = 0; i < categoryNames.length; i++)
@@ -64,7 +77,6 @@ class _CategoriesWidgetState extends State<CategoriesWidget> {
       ),
     );
   }
-
 
   Widget _buildCategoryItem(String category, String imagePath) {
     return Padding(
