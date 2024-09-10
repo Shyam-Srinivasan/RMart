@@ -4,7 +4,7 @@ import 'package:lottie/lottie.dart';
 class LoadingOverlay extends StatelessWidget {
   final bool isLoading;
 
-  const LoadingOverlay({Key? key, required this.isLoading}) : super(key: key);
+  const LoadingOverlay({super.key, required this.isLoading});
 
   @override
   Widget build(BuildContext context) {
@@ -15,6 +15,6 @@ class LoadingOverlay extends StatelessWidget {
         child: Lottie.asset('assets/img/DinnerLoading.json'), // Your loading animation
       ),
     )
-        : SizedBox.shrink();
+        : const SizedBox.shrink();
   }
 }

@@ -11,6 +11,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 class CartPage extends StatefulWidget {
+  const CartPage({super.key});
+
   @override
   _CartPageState createState() => _CartPageState();
 }
@@ -69,7 +71,7 @@ class _CartPageState extends State<CartPage> {
 
       setState(() {
         _cartItems = Map<String, Map<String, dynamic>>.from(
-          (data as Map).map(
+          (data).map(
                 (key, value) => MapEntry(
               key,
               Map<String, dynamic>.from(value),
@@ -90,7 +92,7 @@ class _CartPageState extends State<CartPage> {
       final data = event.snapshot.value;
       if (data != null && data is Map) {
         setState(() {
-          _adminData = Map<String, dynamic>.from(data as Map);
+          _adminData = Map<String, dynamic>.from(data);
         });
       } else {
         setState(() {
@@ -143,7 +145,7 @@ class _CartPageState extends State<CartPage> {
 
   Future<void> _loadData() async {
     // Simulate a delay for loading animation
-    await Future.delayed(Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 500));
 
 
     setState(() {
@@ -156,7 +158,7 @@ class _CartPageState extends State<CartPage> {
       _isLoading = true;
     });
     await _loadData();
-    return await Future.delayed(Duration(milliseconds: 800));
+    return await Future.delayed(const Duration(milliseconds: 800));
     setState(() {
       false;
     });
@@ -165,8 +167,8 @@ class _CartPageState extends State<CartPage> {
   Future<void> _loadOrderData(double totalAmount, List<Map<String, dynamic>> orderedItems) async {
     String? userId = getCurrentUserId(); // Get the userId
     String? shopName = await getSelectedShop();
-    String? orderId = Uuid().v4().replaceAll('-', '').substring(0,20);
-    String? uniqueKey = Uuid().v4();
+    String? orderId = const Uuid().v4().replaceAll('-', '').substring(0,20);
+    String? uniqueKey = const Uuid().v4();
     final timestamp = DateTime.now().toString();
 
     _databaseRef.child('UserDatabase/$userId/OrderedList/$orderId').set({
@@ -211,14 +213,14 @@ class _CartPageState extends State<CartPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Out of Stock'),
-        content: Text('Some items in your cart are out of stock. Please remove them to proceed.'),
+        title: const Text('Out of Stock'),
+        content: const Text('Some items in your cart are out of stock. Please remove them to proceed.'),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: Text('OK'),
+            child: const Text('OK'),
           ),
         ],
       ),
@@ -261,7 +263,7 @@ class _CartPageState extends State<CartPage> {
 
     final isCartEmpty = filteredItems.isEmpty;
 
-    void _updateItemInDatabase(String itemName, Map<String, dynamic> itemDetails) {
+    void updateItemInDatabase(String itemName, Map<String, dynamic> itemDetails) {
       String? userId = getCurrentUserId(); // Get the userId
       // Assuming you have a reference to your Firebase Realtime Database
       DatabaseReference ref = FirebaseDatabase.instance.ref('UserDatabase/$userId/CartItems/$itemName');
@@ -272,7 +274,7 @@ class _CartPageState extends State<CartPage> {
       });
     }
 
-    void _removeItemFromCart(String itemName) {
+    void removeItemFromCart(String itemName) {
       String? userId = getCurrentUserId(); // Get the userId
       // Remove item from local cart
       setState(() {
@@ -284,7 +286,7 @@ class _CartPageState extends State<CartPage> {
       ref.remove();
     }
 
-    bool _isOutOfStock(String itemName) {
+    bool isOutOfStock0(String itemName) {
       for (var category in _adminData.values) {
         if (category[itemName] != null && category[itemName]['quantity'] == 0) {
           return true; // Item is out of stock
@@ -294,22 +296,22 @@ class _CartPageState extends State<CartPage> {
     }
 
     bool hasOutOfStockItems() {
-      return filteredItems.any((entry) => _isOutOfStock(entry.key));
+      return filteredItems.any((entry) => isOutOfStock0(entry.key));
     }
 
 
 
-    void _removeOutOfStockItems() {
-      final outOfStockItems = filteredItems.where((entry) => _isOutOfStock(entry.key)).toList();
+    void removeOutOfStockItems() {
+      final outOfStockItems = filteredItems.where((entry) => isOutOfStock0(entry.key)).toList();
       for (var entry in outOfStockItems) {
-        _removeItemFromCart(entry.key);
+        removeItemFromCart(entry.key);
       }
     }
 
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('My Cart'),
+        title: const Text('My Cart'),
         backgroundColor: Colors.white,
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(4.0),
@@ -334,9 +336,9 @@ class _CartPageState extends State<CartPage> {
               if (_isLoading)
                 Stack(
                   children: [
-                    Opacity(
+                    const Opacity(
                       opacity: 0.6,
-                      child: const ModalBarrier(
+                      child: ModalBarrier(
                         dismissible: false,
                         color: Colors.black,
                       ),
@@ -350,8 +352,8 @@ class _CartPageState extends State<CartPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Lottie.asset('assets/img/DinnerLoading.json', width: 200, height: 200),
-                              SizedBox(height: 20),
-                              Text(
+                              const SizedBox(height: 20),
+                              const Text(
                                 'Please wait...',
                                 style: TextStyle(
                                   color: Colors.white,
@@ -380,8 +382,8 @@ class _CartPageState extends State<CartPage> {
                           height: 350,
                           fit: BoxFit.cover,
                         ),
-                        SizedBox(height: 20),
-                        Text(
+                        const SizedBox(height: 20),
+                        const Text(
                           "Your cart is empty",
                           style: TextStyle(
                             fontSize: 20,
@@ -400,7 +402,7 @@ class _CartPageState extends State<CartPage> {
                     final itemDetails = filteredItems[index].value;
 
                     final imagePath = 'assets/img/${itemName.replaceAll(' ', '')}.jpeg';
-                    final isOutOfStock = _isOutOfStock(itemName);
+                    final isOutOfStock = isOutOfStock0(itemName);
 
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
@@ -414,7 +416,7 @@ class _CartPageState extends State<CartPage> {
                               color: Colors.grey.withOpacity(0.5),
                               spreadRadius: 3,
                               blurRadius: 10,
-                              offset: Offset(0, 3),
+                              offset: const Offset(0, 3),
                             ),
                           ],
                         ),
@@ -432,14 +434,14 @@ class _CartPageState extends State<CartPage> {
                               height: 80,
                               width: 80,
                               color: Colors.grey,
-                              child: Center(
+                              child: const Center(
                                 child: Text(
                                   'No Image',
                                   style: TextStyle(color: Colors.white),
                                 ),
                               ),
                             ),
-                            SizedBox(width: 10),
+                            const SizedBox(width: 10),
                             // Details section
                             Expanded(
                               child: Column(
@@ -447,22 +449,22 @@ class _CartPageState extends State<CartPage> {
                                 children: [
                                   Text(
                                     itemName ?? 'Unknown',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  SizedBox(height: 5),
+                                  const SizedBox(height: 5),
                                   Text(
                                     'Price: ₹${itemDetails['price']?.toStringAsFixed(2) ?? '0.00'}',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 16,
                                     ),
                                   ),
-                                  SizedBox(height: 5),
+                                  const SizedBox(height: 5),
                                   Text(
                                     'Total: ₹${((itemDetails['price'] ?? 0) * (itemDetails['quantity'] ?? 0)).toStringAsFixed(2)}',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.deepPurple,
@@ -475,8 +477,8 @@ class _CartPageState extends State<CartPage> {
                                 ? Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 0),
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 0),
                                   child: Text(
                                     'Out of Stock',
                                     style: TextStyle(
@@ -488,10 +490,10 @@ class _CartPageState extends State<CartPage> {
                                 IconButton(
                                   onPressed: () {
                                     setState(() {
-                                      _removeItemFromCart(itemName);
+                                      removeItemFromCart(itemName);
                                     });
                                   },
-                                  icon: Icon(Icons.delete, color: Colors.red),
+                                  icon: const Icon(Icons.delete, color: Colors.red),
                                 ),
                               ],
                             )
@@ -502,49 +504,49 @@ class _CartPageState extends State<CartPage> {
                                     setState(() {
                                       if (itemDetails['quantity'] != null && itemDetails['quantity'] > 1) {
                                         itemDetails['quantity']--;
-                                        _updateItemInDatabase(itemName, itemDetails);
+                                        updateItemInDatabase(itemName, itemDetails);
                                       } else {
                                         // Remove item from cart and database
-                                        _removeItemFromCart(itemName);
+                                        removeItemFromCart(itemName);
                                       }
                                     });
                                   },
-                                  icon: Icon(Icons.remove),
+                                  icon: const Icon(Icons.remove),
                                   color: Colors.white,
                                   iconSize: 18,
-                                  padding: EdgeInsets.all(2),
-                                  constraints: BoxConstraints(),
+                                  padding: const EdgeInsets.all(2),
+                                  constraints: const BoxConstraints(),
                                   splashRadius: 20,
                                   splashColor: Colors.deepPurple,
                                   style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all(Colors.deepPurple),
-                                    shape: MaterialStateProperty.all(CircleBorder()),
+                                    backgroundColor: WidgetStateProperty.all(Colors.deepPurple),
+                                    shape: WidgetStateProperty.all(const CircleBorder()),
                                   ),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                                   child: Text(
                                     '${itemDetails['quantity'] ?? 0}',
-                                    style: TextStyle(fontSize: 16),
+                                    style: const TextStyle(fontSize: 16),
                                   ),
                                 ),
                                 IconButton(
                                   onPressed: () {
                                     setState(() {
                                       itemDetails['quantity'] = (itemDetails['quantity'] ?? 0) + 1;
-                                      _updateItemInDatabase(itemName, itemDetails);
+                                      updateItemInDatabase(itemName, itemDetails);
                                     });
                                   },
-                                  icon: Icon(Icons.add),
+                                  icon: const Icon(Icons.add),
                                   color: Colors.white,
                                   iconSize: 18,
-                                  padding: EdgeInsets.all(2),
-                                  constraints: BoxConstraints(),
+                                  padding: const EdgeInsets.all(2),
+                                  constraints: const BoxConstraints(),
                                   splashRadius: 20,
                                   splashColor: Colors.deepPurple,
                                   style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all(Colors.deepPurple),
-                                    shape: MaterialStateProperty.all(CircleBorder()),
+                                    backgroundColor: WidgetStateProperty.all(Colors.deepPurple),
+                                    shape: WidgetStateProperty.all(const CircleBorder()),
                                   ),
                                 ),
                               ],
@@ -573,7 +575,7 @@ class _CartPageState extends State<CartPage> {
                     padding: const EdgeInsets.only(top: 5),
                     child: Text(
                       'Total Amount: ₹${totalAmount.toStringAsFixed(0)}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
@@ -583,7 +585,7 @@ class _CartPageState extends State<CartPage> {
                     padding: const EdgeInsets.only(left: 1),
                     child: Text(
                       'Number of Items: $totalItems',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 14,
                       ),
                     ),
@@ -603,22 +605,22 @@ class _CartPageState extends State<CartPage> {
                       : () {
                     _loadOrderData(totalAmount, orderedItems);
                   },
-                  child: Text('Pay Now'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepPurple,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    fixedSize: Size(150, 50),
+                    fixedSize: const Size(150, 50),
                   ),
+                  child: const Text('Pay Now'),
                 ),
               ),
             ],
           ),
         ),
       )
-          : SizedBox.shrink(),
+          : const SizedBox.shrink(),
     );
   }
 

@@ -6,6 +6,8 @@ import 'package:rmart/add_to_cart.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import the add_to_cart.dart
 
 class PopularItemsWidget extends StatefulWidget {
+  const PopularItemsWidget({super.key});
+
   @override
   _PopularItemsWidgetState createState() => _PopularItemsWidgetState();
 }
@@ -62,9 +64,9 @@ class _PopularItemsWidgetState extends State<PopularItemsWidget> {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
         child: _isLoading
-          ? ShimmerEffect(width: 170, height: 225)
+          ? const ShimmerEffect(width: 170, height: 225)
         : Row(
           children: popularItems.map((item) {
             final imagePath = item['image'];
@@ -73,7 +75,7 @@ class _PopularItemsWidgetState extends State<PopularItemsWidget> {
             final quantity = item['quantity'];
 
             return Padding(
-              padding: EdgeInsets.symmetric(horizontal: 7),
+              padding: const EdgeInsets.symmetric(horizontal: 7),
               child: Container(
                 width: 170,
                 height: 225,
@@ -85,7 +87,7 @@ class _PopularItemsWidgetState extends State<PopularItemsWidget> {
                       color: Colors.grey.withOpacity(0.5),
                       spreadRadius: 3,
                       blurRadius: 10,
-                      offset: Offset(0, 3),
+                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),
@@ -96,7 +98,7 @@ class _PopularItemsWidgetState extends State<PopularItemsWidget> {
                       Expanded(
                         child: Container(
                           child: ClipRRect(
-                            borderRadius: BorderRadius.only(
+                            borderRadius: const BorderRadius.only(
                               topRight: Radius.circular(5),
                               topLeft: Radius.circular(5)
                             ),
@@ -113,28 +115,28 @@ class _PopularItemsWidgetState extends State<PopularItemsWidget> {
                         children: [
                           Text(
                             " $foodName",
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Padding(
-                            padding: EdgeInsets.only(bottom: 10, left: 10),
+                            padding: const EdgeInsets.only(bottom: 10, left: 10),
                             child: Text(
                               "₹${price.toInt()}",
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: Align(
                               alignment: Alignment.centerRight,

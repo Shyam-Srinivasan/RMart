@@ -40,7 +40,7 @@ class _CategoriesState extends State<Categories> {
 
   Future<void> _loadData() async {
     // Simulate a delay for loading animation
-    await Future.delayed(Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 500));
     await getSelectedShop(); // Refresh shop name
 
     setState(() {
@@ -53,7 +53,7 @@ class _CategoriesState extends State<Categories> {
       _isLoading = true;
     });
     await _loadData();
-    return await Future.delayed(Duration(milliseconds: 800));
+    return await Future.delayed(const Duration(milliseconds: 800));
     setState(() {
       false;
     });
@@ -84,7 +84,7 @@ class _CategoriesState extends State<Categories> {
       final Map<String, List<Map<String, dynamic>>> categoryItems = {};
       final List<String> categories = [];
 
-      (data as Map<dynamic, dynamic>).forEach((key, value) {
+      (data).forEach((key, value) {
         final categoryName = key as String;
         categories.add(categoryName);
 

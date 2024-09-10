@@ -34,19 +34,21 @@ class MyApp extends StatelessWidget {
       initialRoute: '/splash',
       routes: {
         '/splash': (context) => const SplashScreen(),
-        '/auth': (context) => AuthGate(),
-        '/orders': (context) => OrdersPage(),
-        '/cart': (context) => CartPage(),
-        '/signIn': (context) => SignIn(),
-        '/signUp': (context) => SignUp(),
-        '/option': (context) => ShopOption(),
-        '/home': (context) => Homepage(),
+        '/auth': (context) => const AuthGate(),
+        '/orders': (context) => const OrdersPage(),
+        '/cart': (context) => const CartPage(),
+        '/signIn': (context) => const SignIn(),
+        '/signUp': (context) => const SignUp(),
+        '/option': (context) => const ShopOption(),
+        '/home': (context) => const Homepage(),
       },
     );
   }
 }
 
 class AuthGate extends StatefulWidget {
+  const AuthGate({super.key});
+
   @override
   _AuthGateState createState() => _AuthGateState();
 }
@@ -66,12 +68,12 @@ class _AuthGateState extends State<AuthGate> {
       future: _loginCheck,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         } else {
           if (snapshot.data == true) {
-            return Homepage(); // Navigate to home page
+            return const Homepage(); // Navigate to home page
           } else {
-            return SignIn(); // Navigate to sign in page
+            return const SignIn(); // Navigate to sign in page
           }
         }
       },

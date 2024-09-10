@@ -9,6 +9,8 @@ import 'package:rmart/models/order_item.dart';
 import 'package:rmart/qr_code_page.dart';
 
 class OrdersPage extends StatefulWidget {
+  const OrdersPage({super.key});
+
   @override
   _OrdersPageState createState() => _OrdersPageState();
 }
@@ -34,7 +36,7 @@ class _OrdersPageState extends State<OrdersPage> {
 
   Future<void> _loadData() async {
     // Simulate a delay for loading animation
-    await Future.delayed(Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 500));
 
 
     setState(() {
@@ -47,7 +49,7 @@ class _OrdersPageState extends State<OrdersPage> {
       _isLoading = true;
     });
     await _loadData();
-    return await Future.delayed(Duration(milliseconds: 800));
+    return await Future.delayed(const Duration(milliseconds: 800));
     setState(() {
       false;
     });
@@ -140,10 +142,10 @@ class _OrdersPageState extends State<OrdersPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Orders'),
+        title: const Text('Orders'),
         backgroundColor: Colors.white,
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(50.0),
+          preferredSize: const Size.fromHeight(50.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -167,9 +169,9 @@ class _OrdersPageState extends State<OrdersPage> {
             if (_isLoading)
               Stack(
                 children: [
-                  Opacity(
+                  const Opacity(
                     opacity: 0.6,
-                    child: const ModalBarrier(
+                    child: ModalBarrier(
                       dismissible: false,
                       color: Colors.black,
                     ),
@@ -183,8 +185,8 @@ class _OrdersPageState extends State<OrdersPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Lottie.asset('assets/img/DinnerLoading.json', width: 200, height: 200),
-                            SizedBox(height: 20),
-                            Text(
+                            const SizedBox(height: 20),
+                            const Text(
                               'Please wait...',
                               style: TextStyle(
                                 color: Colors.white,
@@ -252,12 +254,12 @@ class _OrdersPageState extends State<OrdersPage> {
       onTap: () {
         _pageController.animateToPage(
           index,
-          duration: Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
         );
       },
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -274,7 +276,7 @@ class _OrdersPageState extends State<OrdersPage> {
                 height: 3,
                 width: 50,
                 color: Colors.deepPurple,
-                margin: EdgeInsets.only(top: 4),
+                margin: const EdgeInsets.only(top: 4),
               ),
           ],
         ),
@@ -287,7 +289,7 @@ class OrdersView extends StatelessWidget {
   final String title;
   final List<Map<String, dynamic>> orders;
 
-  OrdersView({required this.title, required this.orders});
+  const OrdersView({super.key, required this.title, required this.orders});
 
   @override
   Widget build(BuildContext context) {
@@ -298,13 +300,13 @@ class OrdersView extends StatelessWidget {
         children: [
           Text(
             title,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: Colors.deepPurple
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Expanded(
             child: ListView.builder(
               itemCount: orders.length,
@@ -338,13 +340,13 @@ class OrdersView extends StatelessWidget {
                 builder: (context) => QrCodePage(
                   totalAmount: (order['totalAmount']).toDouble(),
                   orderedItems: orderedItems,  // Pass converted List<Map<String, dynamic>>
-                  uniqueKey: '${order['uniqueKey'].toString()}',
+                  uniqueKey: order['uniqueKey'].toString(),
                 ),
               ),
             );
           }else{
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Center(child: Text("can't open QR for purchased food")), backgroundColor: Colors.red[500]),
+              SnackBar(content: const Center(child: Text("can't open QR for purchased food")), backgroundColor: Colors.red[500]),
             );
           }
 
@@ -353,7 +355,7 @@ class OrdersView extends StatelessWidget {
     child:  Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       elevation: 5,
-      margin: EdgeInsets.symmetric(vertical: 10),
+      margin: const EdgeInsets.symmetric(vertical: 10),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -364,7 +366,7 @@ class OrdersView extends StatelessWidget {
               children: [
                 Text(
                   'Order ID: ${order['orderId']}',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
                 Icon(
                   order['isPurchased'] ? Icons.check_circle : Icons.pending,
@@ -373,10 +375,10 @@ class OrdersView extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text('Shop: ${order['shop']}', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
-            Text('Total Amount: ₹${order['totalAmount']}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-            Divider(),
+            Text('Total Amount: ₹${order['totalAmount']}', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+            const Divider(),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: (order['orderItems'] as List<OrderItem>).map((item) {
@@ -385,8 +387,8 @@ class OrdersView extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('${item.name}', style: TextStyle(fontSize: 14)),
-                      Text('x${item.quantity} - ₹${item.price}', style: TextStyle(fontSize: 14)),
+                      Text(item.name, style: const TextStyle(fontSize: 14)),
+                      Text('x${item.quantity} - ₹${item.price}', style: const TextStyle(fontSize: 14)),
                     ],
                   ),
                 );

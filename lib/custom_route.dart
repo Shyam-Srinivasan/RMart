@@ -28,7 +28,7 @@ class SlideUpPageRoute extends PageRouteBuilder {
         child: child,
       );
     },
-    transitionDuration: Duration(milliseconds: 3000), // Duration of the transition
-    reverseTransitionDuration: Duration(milliseconds: 3000), // Reverse duration
+    transitionDuration: const Duration(milliseconds: 3000), // Duration of the transition
+    reverseTransitionDuration: const Duration(milliseconds: 3000), // Reverse duration
   );
 }

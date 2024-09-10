@@ -8,12 +8,12 @@ class ShimmerEffect extends StatelessWidget {
   final BoxShadow? boxShadow;
 
   const ShimmerEffect({
-    Key? key,
+    super.key,
     required this.width,
     required this.height,
     this.borderRadius = const BorderRadius.all(Radius.circular(5)),
     this.boxShadow,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class ShimmerEffect extends StatelessWidget {
 
   Widget _buildShimmerItem() {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Shimmer.fromColors(
         baseColor: Colors.grey[300]!,
         highlightColor: Colors.grey[100]!,

@@ -55,7 +55,7 @@ class _HomepageState extends State<Homepage> {
 
   Future<void> _loadData() async {
     // Simulate a delay for loading animation
-    await Future.delayed(Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 500));
     await _getShopName(); // Refresh shop name
     _getCurrentUser(); // Refresh current user info
 
@@ -70,7 +70,7 @@ class _HomepageState extends State<Homepage> {
       _isLoading = true;
     });
     await _loadData();
-    return await Future.delayed(Duration(milliseconds: 800));
+    return await Future.delayed(const Duration(milliseconds: 800));
     setState(() {
       false;
     });
@@ -173,9 +173,9 @@ class _HomepageState extends State<Homepage> {
             if (_isLoading)
               Stack(
                 children: [
-                  Opacity(
+                  const Opacity(
                     opacity: 0.6,
-                    child: const ModalBarrier(
+                    child: ModalBarrier(
                       dismissible: false,
                       color: Colors.black,
                     ),
@@ -187,8 +187,8 @@ class _HomepageState extends State<Homepage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Lottie.asset('assets/img/DinnerLoading.json', width: 200, height: 200),
-                          SizedBox(height: 20),
-                          Text(
+                          const SizedBox(height: 20),
+                          const Text(
                             'Please wait...',
                             style: TextStyle(
                               color: Colors.white,
@@ -211,11 +211,11 @@ class _HomepageState extends State<Homepage> {
                     child: Align(
                       alignment: Alignment.topCenter,
                       child: InkWell(
-                        overlayColor: MaterialStateProperty.all<Color>(Colors.white.withOpacity(0)),
+                        overlayColor: WidgetStateProperty.all<Color>(Colors.white.withOpacity(0)),
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => SearchPage()),
+                            MaterialPageRoute(builder: (context) => const SearchPage()),
                           );
                         },
                         child: Container(
@@ -293,7 +293,7 @@ class _HomepageState extends State<Homepage> {
                       ],
                     ),
                   ),
-                  PopularItemsWidget(),
+                  const PopularItemsWidget(),
                 ],
               ),
           ],
@@ -367,7 +367,7 @@ class _HomepageState extends State<Homepage> {
                 onTap: (){
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => AboutUsPage())
+                    MaterialPageRoute(builder: (context) => const AboutUsPage())
                   );
                 },
                   child: const Text('About Us')

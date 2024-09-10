@@ -41,7 +41,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
 
       // Show a success message
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Feedback submitted successfully!'),
         ),
       );
@@ -51,7 +51,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
     } else {
       // Show an error message if feedback is empty
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Please enter some feedback.'),
         ),
       );
@@ -62,8 +62,8 @@ class _FeedbackPageState extends State<FeedbackPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        SizedBox(height: 8),
+        Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
         Row(
           children: List.generate(5, (index) {
             final starRating = index + 1.0;
@@ -105,7 +105,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
             TextField(
               controller: _feedbackController,
               maxLines: 5,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Your Feedback',
                 hintText: 'Write your feedback here...',
@@ -132,12 +132,12 @@ class _FeedbackPageState extends State<FeedbackPage> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _submitFeedback,
-              child: const Text('Submit Feedback'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepPurple,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
+              child: const Text('Submit Feedback'),
             ),
           ],
         ),

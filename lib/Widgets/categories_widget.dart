@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'package:rmart/shimmer_effect.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CategoriesWidget extends StatefulWidget {
@@ -63,9 +61,9 @@ class _CategoriesWidgetState extends State<CategoriesWidget> {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 5),
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 5),
         child: _isLoading
-          ? ShimmerEffect(width: 170, height: 225)
+          ? const ShimmerEffect(width: 170, height: 225)
         : Row(
           children: [
             // images are used from local
@@ -80,11 +78,11 @@ class _CategoriesWidgetState extends State<CategoriesWidget> {
 
   Widget _buildCategoryItem(String category, String imagePath) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: GestureDetector(
         onTap: () => widget.onCategorySelected(category),
         child: Container(
-          padding: EdgeInsets.only(bottom: 15),
+          padding: const EdgeInsets.only(bottom: 15),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(5),
@@ -93,14 +91,14 @@ class _CategoriesWidgetState extends State<CategoriesWidget> {
                 color: Colors.grey.withOpacity(0.5),
                 spreadRadius: 2,
                 blurRadius: 10,
-                offset: Offset(0, 3),
+                offset: const Offset(0, 3),
               ),
             ],
           ),
           child: Column(
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                   topRight: Radius.circular(5),
                   topLeft: Radius.circular(5)
                 ),
@@ -112,10 +110,10 @@ class _CategoriesWidgetState extends State<CategoriesWidget> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.only(top: 20, bottom: 0),
+                padding: const EdgeInsets.only(top: 20, bottom: 0),
                 child: Text(
                   category,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),

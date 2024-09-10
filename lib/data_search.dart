@@ -5,6 +5,8 @@ import 'package:rmart/add_to_cart.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Ensure the import is correct
 
 class SearchPage extends StatefulWidget {
+  const SearchPage({super.key});
+
   @override
   _SearchPageState createState() => _SearchPageState();
 }
@@ -66,7 +68,7 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(65.0), // Increased height for better spacing
+        preferredSize: const Size.fromHeight(65.0), // Increased height for better spacing
         child: Column(
           children: [
             AppBar(
@@ -74,7 +76,7 @@ class _SearchPageState extends State<SearchPage> {
               title: Transform(
                 transform: Matrix4.translationValues(-18.0, -3, 0.0), // Move the search bar slightly left
                 child: Container(
-                  margin: EdgeInsets.only(top: 8.0), // Margin for spacing
+                  margin: const EdgeInsets.only(top: 8.0), // Margin for spacing
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -85,7 +87,7 @@ class _SearchPageState extends State<SearchPage> {
                           color: Colors.black.withOpacity(0.2), // Shadow color
                           spreadRadius: 0, // Spread of shadow
                           blurRadius: 6, // Blur intensity
-                          offset: Offset(0, 0), // Offset of shadow
+                          offset: const Offset(0, 0), // Offset of shadow
                         ),
                       ],
                     ),
@@ -100,16 +102,16 @@ class _SearchPageState extends State<SearchPage> {
                         hintText: 'Search',
                         hintStyle: TextStyle(color: Colors.black.withOpacity(0.3)),
                         border: InputBorder.none, // Remove default border
-                        contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 20.0),
                       ),
-                      style: TextStyle(color: Colors.black),
+                      style: const TextStyle(color: Colors.black),
                       cursorColor: Colors.deepPurple.withOpacity(0.8),
                     ),
                   ),
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 8.0, // Space between the search bar and the divider
             ),
             Divider(
@@ -136,7 +138,7 @@ class _SearchPageState extends State<SearchPage> {
 
     return suggestions.map((item) {
       return Padding(
-        padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
         child: Container(
           width: double.infinity,
           height: 200, // Adjusted height
@@ -148,7 +150,7 @@ class _SearchPageState extends State<SearchPage> {
                 color: Colors.grey.withOpacity(0.5),
                 spreadRadius: 2,
                 blurRadius: 5,
-                offset: Offset(0, 3),
+                offset: const Offset(0, 3),
               ),
             ],
           ),
@@ -168,7 +170,7 @@ class _SearchPageState extends State<SearchPage> {
                   children: [
                     Text(
                       item['name'],
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),

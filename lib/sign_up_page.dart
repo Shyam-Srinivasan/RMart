@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:rmart/sign_in_page.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:lottie/lottie.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 
@@ -79,7 +77,7 @@ class _SignUpState extends State<SignUp> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            SizedBox(height: 50),
+            const SizedBox(height: 50),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -119,7 +117,7 @@ class _SignUpState extends State<SignUp> {
               child: TextButton(
                 onPressed: _signInWithGoogle,
                 style: OutlinedButton.styleFrom(
-                  side: BorderSide(
+                  side: const BorderSide(
                       color: Colors.black12,
                       width: 1.0
                   ),
@@ -130,8 +128,8 @@ class _SignUpState extends State<SignUp> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Image.asset('assets/img/Google.jpeg', width: 35, height: 35),
-                    SizedBox(width: 10),
-                    Text('Google')
+                    const SizedBox(width: 10),
+                    const Text('Google')
                   ],
                 ),
               ),
@@ -285,7 +283,7 @@ class _SignUpState extends State<SignUp> {
                 ),
               ),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             SizedBox(
               width: 335,
               height: 50,
@@ -310,21 +308,21 @@ class _SignUpState extends State<SignUp> {
                 ),
               ),
             ),
-            SizedBox(height: 15),
+            const SizedBox(height: 15),
             Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Already have an account?", style: TextStyle(fontSize: 15)),
-                  SizedBox(width: 10),
+                  const Text("Already have an account?", style: TextStyle(fontSize: 15)),
+                  const SizedBox(width: 10),
                   InkWell(
                     onTap: () {
                       Navigator.push(
                           context,
-                        _createRoute(SignIn())
+                        _createRoute(const SignIn())
                       );
                     },
-                    child: Text('Sign In', style: TextStyle(color: Colors.deepPurple, fontSize: 15, fontWeight: FontWeight.bold)),
+                    child: const Text('Sign In', style: TextStyle(color: Colors.deepPurple, fontSize: 15, fontWeight: FontWeight.bold)),
                   )
                 ],
               ),
@@ -491,6 +489,6 @@ Route _createRoute(Widget child) {
         child: child,
       );
     },
-      transitionDuration: Duration(milliseconds: 800)
+      transitionDuration: const Duration(milliseconds: 800)
   );
 }

@@ -7,6 +7,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -67,7 +69,7 @@ class _LoginPageState extends State<LoginPage> {
                     height: 200,
                     child: Image.asset('assets/img/Logo.jpeg', height: 180, width: 180,),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   const Text('Name'),
                   TextField(
                     controller: _nameController,
@@ -75,7 +77,7 @@ class _LoginPageState extends State<LoginPage> {
                       border: OutlineInputBorder(),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   const Text('College Email ID'),
                   TextField(
                     controller: _emailController,
@@ -83,7 +85,7 @@ class _LoginPageState extends State<LoginPage> {
                       border: OutlineInputBorder(),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   const Text('Phone Number'),
                   TextField(
                     controller: _phoneController,
@@ -92,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     keyboardType: TextInputType.phone,
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Center(
                     child: ElevatedButton(
                       onPressed: () {
@@ -102,7 +104,6 @@ class _LoginPageState extends State<LoginPage> {
                           _isVisible = true;
                         });
                       },
-                      child: const Text('Generate OTP'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.deepPurple,
                         foregroundColor: Colors.white,
@@ -111,9 +112,10 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         fixedSize: const Size(150, 50),
                       ),
+                      child: const Text('Generate OTP'),
                     ),
                   ),
-                  SizedBox(height: 50),
+                  const SizedBox(height: 50),
                   Visibility(
                     visible: _isVisible,
                     child: Column(
@@ -126,7 +128,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             const SizedBox(width: 12),
                             Center(
-                              child: Container(
+                              child: SizedBox(
                                 width: 250,
                                 height: 50,
                                 child: TextField(
@@ -144,7 +146,6 @@ class _LoginPageState extends State<LoginPage> {
                         const SizedBox(height: 20),
                         ElevatedButton(
                           onPressed: _verifyOtp,
-                          child: const Text('Verify'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.deepPurple,
                             foregroundColor: Colors.white,
@@ -153,6 +154,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             fixedSize: const Size(150, 50),
                           ),
+                          child: const Text('Verify'),
                         ),
                       ],
                     ),
@@ -165,9 +167,9 @@ class _LoginPageState extends State<LoginPage> {
           if (isLoading)
             Stack(
               children: [
-                Opacity(
+                const Opacity(
                   opacity: 0.6,
-                  child: const ModalBarrier(
+                  child: ModalBarrier(
                     dismissible: false,
                     color: Colors.black,
                   ),
@@ -179,8 +181,8 @@ class _LoginPageState extends State<LoginPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Lottie.asset('assets/img/DinnerLoading.json', width: 200, height: 200),
-                        SizedBox(height: 20),
-                        Text(
+                        const SizedBox(height: 20),
+                        const Text(
                           'Please wait...',
                           style: TextStyle(
                             color: Colors.white,

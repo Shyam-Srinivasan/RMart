@@ -6,7 +6,7 @@ import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ShopOption extends StatefulWidget {
-  const ShopOption({Key? key}) : super(key: key);
+  const ShopOption({super.key});
 
   @override
   State<ShopOption> createState() => _ShopOptionState();
@@ -26,7 +26,7 @@ class _ShopOptionState extends State<ShopOption> {
     });
 
     // Simulate a delay for loading animation
-    await Future.delayed(Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 500));
 
     // Save the selected shop
     await _saveShopName(shopName);
@@ -55,9 +55,9 @@ class _ShopOptionState extends State<ShopOption> {
           if (_isLoading)
             Stack(
               children: [
-                Opacity(
+                const Opacity(
                   opacity: 0.6,
-                  child: const ModalBarrier(
+                  child: ModalBarrier(
                     dismissible: false,
                     color: Colors.black,
                   ),
@@ -69,8 +69,8 @@ class _ShopOptionState extends State<ShopOption> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Lottie.asset('assets/img/DinnerLoading.json', width: 200, height: 200),
-                        SizedBox(height: 20),
-                        Text(
+                        const SizedBox(height: 20),
+                        const Text(
                           'Please wait...',
                           style: TextStyle(
                             color: Colors.white,
@@ -95,18 +95,18 @@ class _ShopOptionState extends State<ShopOption> {
                       onPressed: () => _navigateToHome('Rec Hut'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
-                        minimumSize: Size(180, 180),
+                        minimumSize: const Size(180, 180),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        side: BorderSide(
+                        side: const BorderSide(
                           color: Colors.deepPurple,
                           width: 2
                         ),
                         shadowColor: Colors.black.withOpacity(0.7),
                         elevation: 10,
                       ),
-                      child: Text(
+                      child: const Text(
                         'Rec Hut',
                         style: TextStyle(
                           fontSize: 20,
@@ -115,23 +115,23 @@ class _ShopOptionState extends State<ShopOption> {
                         ),
                       ),
                     ),
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
                     ElevatedButton(
                       onPressed: () => _navigateToHome('Rec Cafe'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
-                        minimumSize: Size(180, 180),
+                        minimumSize: const Size(180, 180),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        side: BorderSide(
+                        side: const BorderSide(
                             color: Colors.deepPurple,
                             width: 2
                         ),
                         shadowColor: Colors.black.withOpacity(0.7),
                         elevation: 10,
                       ),
-                      child: Text(
+                      child: const Text(
                         'Rec Cafe',
                         style: TextStyle(
                           fontSize: 20,
@@ -142,7 +142,7 @@ class _ShopOptionState extends State<ShopOption> {
                     ),
                   ],
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -150,18 +150,18 @@ class _ShopOptionState extends State<ShopOption> {
                       onPressed: () => _navigateToHome('Rec Mart'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
-                        minimumSize: Size(180, 180),
+                        minimumSize: const Size(180, 180),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        side: BorderSide(
+                        side: const BorderSide(
                             color: Colors.deepPurple,
                             width: 2
                         ),
                         shadowColor: Colors.black.withOpacity(0.7),
                         elevation: 10,
                       ),
-                      child: Text(
+                      child: const Text(
                         'Rec Mart',
                         style: TextStyle(
                           fontSize: 20,
@@ -170,23 +170,23 @@ class _ShopOptionState extends State<ShopOption> {
                         ),
                       ),
                     ),
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
                     ElevatedButton(
                       onPressed: () => _navigateToHome('Fresh Crush'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
-                        minimumSize: Size(180, 180),
+                        minimumSize: const Size(180, 180),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        side: BorderSide(
+                        side: const BorderSide(
                             color: Colors.deepPurple,
                             width: 2
                         ),
                         shadowColor: Colors.black.withOpacity(0.7),
                         elevation: 10,
                       ),
-                      child: Text(
+                      child: const Text(
                         'Fresh Crush',
                         style: TextStyle(
                           fontSize: 20,
@@ -199,7 +199,7 @@ class _ShopOptionState extends State<ShopOption> {
                 ),
               ],
             ),
-          Positioned(
+          const Positioned(
             top: 100,
             left: 0,
             right: 0,

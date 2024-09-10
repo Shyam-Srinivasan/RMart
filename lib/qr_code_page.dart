@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:uuid/uuid.dart';
 
 class QrCodePage extends StatelessWidget {
   final List<Map<String, dynamic>> orderedItems;
   final double totalAmount;
   final String uniqueKey;
 
-  QrCodePage({required this.orderedItems, required this.totalAmount, required this.uniqueKey});
+  const QrCodePage({super.key, required this.orderedItems, required this.totalAmount, required this.uniqueKey});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +31,7 @@ class QrCodePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('QR Code'),
+        title: const Text('QR Code'),
         backgroundColor: Colors.white,
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(4.0),
@@ -59,27 +58,27 @@ class QrCodePage extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
               boxShadow: [
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.2),
                   spreadRadius: 2,
                   blurRadius: 8,
-                  offset: Offset(0, -2),
+                  offset: const Offset(0, -2),
                 ),
               ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Order Summary',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 ...orderedItems.map((item) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -88,17 +87,17 @@ class QrCodePage extends StatelessWidget {
                       children: [
                         Text(
                           item['name'],
-                          style: TextStyle(fontSize: 16),
+                          style: const TextStyle(fontSize: 16),
                         ),
                         Text(
                           '${item['quantity']} x ₹${item['price']}',
-                          style: TextStyle(fontSize: 16),
+                          style: const TextStyle(fontSize: 16),
                         ),
                       ],
                     ),
                   );
-                }).toList(),
-                Divider(
+                }),
+                const Divider(
                   height: 20,
                   thickness: 1,
                   color: Colors.grey,
@@ -106,7 +105,7 @@ class QrCodePage extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+                    const Text(
                       'Total Amount',
                       style: TextStyle(
                         fontSize: 18,
@@ -115,7 +114,7 @@ class QrCodePage extends StatelessWidget {
                     ),
                     Text(
                       '₹${totalAmount.toInt()}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.deepPurple,

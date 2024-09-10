@@ -7,7 +7,7 @@ import 'package:firebase_database/firebase_database.dart';
 class AddToCartButton extends StatefulWidget {
   final Map<String, dynamic> foodItem;
 
-  AddToCartButton({required this.foodItem});
+  const AddToCartButton({super.key, required this.foodItem});
 
   @override
   _AddToCartButtonState createState() => _AddToCartButtonState();
@@ -96,9 +96,9 @@ class _AddToCartButtonState extends State<AddToCartButton> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 8.0, right: 5),
+      padding: const EdgeInsets.only(bottom: 8.0, right: 5),
       child: AnimatedContainer(
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         width: 100,
         height: 33,
         decoration: BoxDecoration(
@@ -112,7 +112,7 @@ class _AddToCartButtonState extends State<AddToCartButton> {
             foregroundColor: Colors.white,
             padding: EdgeInsets.zero,
           ),
-          child: Text('Add', style: TextStyle(fontSize: 16)),
+          child: const Text('Add', style: TextStyle(fontSize: 16)),
         )
             : Row(
           children: [
@@ -130,13 +130,13 @@ class _AddToCartButtonState extends State<AddToCartButton> {
                     }
                   });
                 },
-                icon: Icon(Icons.remove, color: Colors.white, size: 24),
+                icon: const Icon(Icons.remove, color: Colors.white, size: 24),
                 padding: EdgeInsets.zero,
               ),
             ),
             Text(
               '$quantity',
-              style: TextStyle(color: Colors.white, fontSize: 16),
+              style: const TextStyle(color: Colors.white, fontSize: 16),
             ),
             Flexible(
               child: IconButton(
@@ -147,7 +147,7 @@ class _AddToCartButtonState extends State<AddToCartButton> {
                     _updateDatabase();
                   });
                 },
-                icon: Icon(Icons.add, color: Colors.white, size: 24),
+                icon: const Icon(Icons.add, color: Colors.white, size: 24),
                 padding: EdgeInsets.zero,
               ),
             ),
