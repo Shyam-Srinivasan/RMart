@@ -99,11 +99,17 @@ class _CategoriesWidgetState extends State<CategoriesWidget> {
           ),
           child: Column(
             children: [
-              Image.asset(
-                imagePath,
-                width: 170,
-                height: 160,
-                fit: BoxFit.cover,
+              ClipRRect(
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(5),
+                  topLeft: Radius.circular(5)
+                ),
+                child: Image.asset(
+                  imagePath,
+                  width: 170,
+                  height: 160,
+                  fit: BoxFit.cover,
+                ),
               ),
               Padding(
                 padding: EdgeInsets.only(top: 20, bottom: 0),

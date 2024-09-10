@@ -261,11 +261,17 @@ class _CategoriesState extends State<Categories> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween, // Ensure content is spaced evenly
               children: [
                 Expanded(
-                  child: Image.asset(
-                    itemImage,
-                    height: 150,
-                    width: 200,
-                    fit: BoxFit.cover, // Ensure the image covers the full height
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(10),
+                      topRight: Radius.circular(10),
+                    ),
+                    child: Image.asset(
+                      itemImage,
+                      height: 150,
+                      width: 200,
+                      fit: BoxFit.cover, // Ensure the image covers the full height
+                    ),
                   ),
                 ),
                 Row(

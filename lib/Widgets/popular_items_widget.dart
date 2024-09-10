@@ -95,11 +95,17 @@ class _PopularItemsWidgetState extends State<PopularItemsWidget> {
                     children: [
                       Expanded(
                         child: Container(
-                          child: Image.asset(
-                            imagePath,
-                            height: 150,
-                            width: 200,
-                            fit: BoxFit.cover,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.only(
+                              topRight: Radius.circular(5),
+                              topLeft: Radius.circular(5)
+                            ),
+                            child: Image.asset(
+                              imagePath,
+                              height: 150,
+                              width: 200,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                       ),

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>507312397854-2dvq85obqi8etk5gi4hd9esu0ti1m2h6.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.507312397854-2dvq85obqi8etk5gi4hd9esu0ti1m2h6</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>507312397854-3uo5vmoqovef5sbjd9fug0eterqh5poi.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyD59W4KGWYnPbGP7w427HwhWmh0MTT41T0</string>
+	<key>GCM_SENDER_ID</key>
+	<string>507312397854</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.rmart</string>
+	<key>PROJECT_ID</key>
+	<string>rec-mart</string>
+	<key>STORAGE_BUCKET</key>
+	<string>rec-mart.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:507312397854:ios:0552116ffa5f1e7a0c580f</string>
+	<key>DATABASE_URL</key>
+	<string>https://rec-mart-default-rtdb.asia-southeast1.firebasedatabase.app</string>
+</dict>
+</plist>

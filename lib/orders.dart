@@ -1,6 +1,12 @@
+import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:lottie/lottie.dart';
-import 'package:rmart/models/order_item.dart'; // Import the OrderItem model
+import 'package:rmart/models/order_item.dart';
+import 'package:rmart/qr_code_page.dart';
 
 class OrdersPage extends StatefulWidget {
   @override
@@ -8,34 +14,125 @@ class OrdersPage extends StatefulWidget {
 }
 
 class _OrdersPageState extends State<OrdersPage> {
-  final PageController _pageController = PageController();
+  late final PageController _pageController;
+  late final DatabaseReference _databaseRef;
+  late final StreamSubscription<DatabaseEvent> _streamSubscription;
+  bool _isLoading = true;
+  List<Map<String, dynamic>> _pendingOrders = [];
+  List<Map<String, dynamic>> _purchasedOrders = [];
   int _currentPage = 0;
-  late Future<List<OrderItem>> _ordersFuture;
 
   @override
   void initState() {
     super.initState();
-    _ordersFuture = fetchOrders();
+    _databaseRef = FirebaseDatabase.instance.ref();
+    _pageController = PageController();
+    _pageController.addListener(_onPageChanged);
+    _activateListeners();
   }
 
-  Future<List<OrderItem>> fetchOrders() async {
-    // Simulate network delay
-    // await Future.delayed(Duration(seconds: 2));
 
-    // Sample data
-    final orders = [
-      OrderItem(name: 'Sambar Rice', price: 80, quantity: 2, isPurchased: true),
-      OrderItem(name: 'Veg Biriyani', price: 150, quantity: 3, isPurchased: false),
-      OrderItem(name: 'Choola Poori', price: 100, quantity: 2, isPurchased: true),
-      OrderItem(name: 'Chapati', price: 75, quantity: 5, isPurchased: false),
-    ];
+  Future<void> _loadData() async {
+    // Simulate a delay for loading animation
+    await Future.delayed(Duration(milliseconds: 500));
 
-    return orders;
-  }
 
-  void _onPageChanged(int page) {
     setState(() {
-      _currentPage = page;
+      _isLoading = false;
+    });
+  }
+
+  Future<void> _handleRefresh() async{
+    setState(() {
+      _isLoading = true;
+    });
+    await _loadData();
+    return await Future.delayed(Duration(milliseconds: 800));
+    setState(() {
+      false;
+    });
+  }
+
+  @override
+  void dispose() {
+    _streamSubscription.cancel();
+    _pageController.removeListener(_onPageChanged);
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _activateListeners() async {
+    String? userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) {
+      // Handle the case when no user is signed in
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
+    _streamSubscription = _databaseRef
+        .child('UserDatabase/$userId/OrderedList')
+        .onValue
+        .listen((event) {
+      final data = event.snapshot.value as Map<dynamic, dynamic>?;
+      // print('Fetched data: $data');
+
+      if (data == null) {
+        setState(() {
+          _isLoading = false;
+          _pendingOrders = [];
+          _purchasedOrders = [];
+        });
+        return;
+      }
+
+      final List<Map<String, dynamic>> pendingOrders = [];
+      final List<Map<String, dynamic>> purchasedOrders = [];
+
+      data.forEach((key, value) {
+        final order = value as Map<dynamic, dynamic>;
+        final orderItems = (order['orderItems'] as List<dynamic>? ?? []).map((item) {
+          return OrderItem(
+            name: item['name'] as String,
+            price: (item['price'] as num).toDouble(),
+            quantity: item['quantity'] as int,
+            isPurchased: order['isPurchased'] as bool,
+          );
+        }).toList();
+
+        final Map<String, dynamic> orderData = {
+          'orderId': key,
+          'shop': order['shop'],
+          'totalAmount': order['totalAmount'],
+          'isPurchased': order['isPurchased'],
+          'orderItems': orderItems,
+          'uniqueKey': order['uniqueKey']
+        };
+
+        // print('---------------------------\n');
+        // print('Order: $order\n');
+        // print('---------------------------\n');
+        // print('orderData: ${orderData['uniqueKey']}\n');
+
+        if (order['isPurchased'] as bool) {
+          purchasedOrders.add(orderData);
+        } else {
+          pendingOrders.add(orderData);
+        }
+      });
+
+      setState(() {
+        _isLoading = false;
+        _pendingOrders = pendingOrders;
+        _purchasedOrders = purchasedOrders;
+      });
+    });
+  }
+
+  void _onPageChanged() {
+    setState(() {
+      _currentPage = _pageController.page?.round() ?? 0;
     });
   }
 
@@ -46,62 +143,109 @@ class _OrdersPageState extends State<OrdersPage> {
         title: Text('Orders'),
         backgroundColor: Colors.white,
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(50.0), // Adjust height to fit both tab indicators and divider
-          child: Column(
+          preferredSize: Size.fromHeight(50.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Divider(
-                height: 4.0,
-                thickness: 1,
-                color: Color(0x61693BB8),
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildTabIndicator('Purchased', 0),
-                  _buildTabIndicator('Pending', 1),
-                ],
-              ),
-
+              _buildTabIndicator('Pending', 0),
+              _buildTabIndicator('Purchased', 1),
             ],
           ),
         ),
       ),
-      body: FutureBuilder<List<OrderItem>>(
-        future: _ordersFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: Lottie.asset('assets/animations/DinnerLoading.json'),
-            );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text('Error loading orders'),
-            );
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(
-              child: Text('No orders available'),
-            );
-          }
+      body: LiquidPullToRefresh(
+        onRefresh: _handleRefresh,
+        color:Colors.deepPurple,
+        backgroundColor: Colors.deepPurple[200],
+        animSpeedFactor: 2,
+        springAnimationDurationInMilliseconds: 500,
 
-          final orders = snapshot.data!;
-          final purchasedItems = orders.where((item) => item.isPurchased).toList();
-          final pendingItems = orders.where((item) => !item.isPurchased).toList();
+        showChildOpacityTransition: false,
 
-          return PageView(
-            controller: _pageController,
-            onPageChanged: _onPageChanged,
-            children: [
-              OrdersView(title: 'Purchased', items: purchasedItems),
-              OrdersView(title: 'Pending', items: pendingItems),
-            ],
-          );
-        },
+        child: Stack(
+          children: [
+            if (_isLoading)
+              Stack(
+                children: [
+                  Opacity(
+                    opacity: 0.6,
+                    child: const ModalBarrier(
+                      dismissible: false,
+                      color: Colors.black,
+                    ),
+                  ),
+                  Center(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 300),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Lottie.asset('assets/img/DinnerLoading.json', width: 200, height: 200),
+                            SizedBox(height: 20),
+                            Text(
+                              'Please wait...',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            if (!_isLoading)
+              PageView(
+                controller: _pageController,
+                children: [
+                  OrdersView(title: 'Pending', orders: _pendingOrders),
+                  OrdersView(title: 'Purchased', orders: _purchasedOrders),
+                ],
+              ),
+          ],
+        ),
       ),
     );
   }
+
+ /* Widget _showLoading(){
+    return Stack(
+      children: [
+        Opacity(
+          opacity: 0.6,
+          child: const ModalBarrier(
+            dismissible: false,
+            color: Colors.black,
+          ),
+        ),
+        Center(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Lottie.asset('assets/img/DinnerLoading.json', width: 200, height: 200),
+                SizedBox(height: 20),
+                Text(
+                  'Please wait...',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }*/
 
   Widget _buildTabIndicator(String label, int index) {
     return GestureDetector(
@@ -141,9 +285,9 @@ class _OrdersPageState extends State<OrdersPage> {
 
 class OrdersView extends StatelessWidget {
   final String title;
-  final List<OrderItem> items;
+  final List<Map<String, dynamic>> orders;
 
-  OrdersView({required this.title, required this.items});
+  OrdersView({required this.title, required this.orders});
 
   @override
   Widget build(BuildContext context) {
@@ -157,28 +301,101 @@ class OrdersView extends StatelessWidget {
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
+              color: Colors.deepPurple
             ),
           ),
           SizedBox(height: 16),
           Expanded(
             child: ListView.builder(
-              itemCount: items.length,
+              itemCount: orders.length,
               itemBuilder: (context, index) {
-                final item = items[index];
-                return Card(
-                  margin: EdgeInsets.symmetric(vertical: 8),
-                  child: ListTile(
-                    contentPadding: EdgeInsets.all(16),
-                    title: Text(item.name),
-                    subtitle: Text('Price: ₹${item.price} x ${item.quantity}'),
-                    trailing: Text('Total: ₹${(item.price * item.quantity).toInt()}'),
-                  ),
-                );
+                final order = orders[index];
+                return _buildOrderCard(context,order);
               },
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildOrderCard(BuildContext context, Map<String, dynamic> order) {
+    return GestureDetector(
+        onTap: () {
+          // Convert List<OrderItem> to List<Map<String, dynamic>>
+          List<Map<String, dynamic>> orderedItems = (order['orderItems'] as List<OrderItem>).map((item) {
+            return {
+              'name': item.name,
+              'price': item.price,
+              'quantity': item.quantity,
+            };
+          }).toList();
+
+          if (!order['isPurchased']){
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => QrCodePage(
+                  totalAmount: (order['totalAmount']).toDouble(),
+                  orderedItems: orderedItems,  // Pass converted List<Map<String, dynamic>>
+                  uniqueKey: '${order['uniqueKey'].toString()}',
+                ),
+              ),
+            );
+          }else{
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Center(child: Text("can't open QR for purchased food")), backgroundColor: Colors.red[500]),
+            );
+          }
+
+
+        },
+    child:  Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      elevation: 5,
+      margin: EdgeInsets.symmetric(vertical: 10),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Order ID: ${order['orderId']}',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                Icon(
+                  order['isPurchased'] ? Icons.check_circle : Icons.pending,
+                  color: order['isPurchased'] ? Colors.green : Colors.orange,
+                  size: 24,
+                ),
+              ],
+            ),
+            SizedBox(height: 8),
+            Text('Shop: ${order['shop']}', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+            Text('Total Amount: ₹${order['totalAmount']}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+            Divider(),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: (order['orderItems'] as List<OrderItem>).map((item) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('${item.name}', style: TextStyle(fontSize: 14)),
+                      Text('x${item.quantity} - ₹${item.price}', style: TextStyle(fontSize: 14)),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+      ),
+    )
     );
   }
 }
