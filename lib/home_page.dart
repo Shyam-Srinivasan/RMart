@@ -336,7 +336,7 @@ class _HomepageState extends State<Homepage> {
               accountEmail: Text(_currentUser?.email ?? 'No email'),
               currentAccountPicture: const ClipOval(
                 child: Image(
-                  image: AssetImage('assets/img/Shyam_photo.jpg'),
+                  image: AssetImage('assets/img/User.jpeg'),
                   fit: BoxFit.cover,
                 ),
               ),

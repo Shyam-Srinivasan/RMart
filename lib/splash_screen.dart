@@ -16,7 +16,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     _controller = VideoPlayerController.asset(
-      'assets/img/Log.mp4',
+      'assets/img/Logo.mp4',
     )
     ..initialize().then((_){
       setState(() {});

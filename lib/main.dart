@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:rmart/shop_option.dart';
 import 'package:rmart/sign_in_page.dart'; // Import the sign_in_page.dart
 import 'package:rmart/sign_up_page.dart';
@@ -13,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Razorpay _razorpay = Razorpay();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

@@ -10,6 +10,8 @@ import 'package:rmart/qr_code_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
+import 'payment_service.dart';
+
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
 
@@ -171,6 +173,7 @@ class _CartPageState extends State<CartPage> {
     String? uniqueKey = const Uuid().v4();
     final timestamp = DateTime.now().toString();
 
+    /*
     _databaseRef.child('UserDatabase/$userId/OrderedList/$orderId').set({
       'shop': shopName,
       'isPurchased': false,
@@ -188,6 +191,23 @@ class _CartPageState extends State<CartPage> {
       'orderItems': orderedItems,
     });
 
+    */
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PaymentService(
+          totalAmount: totalAmount,
+          orderedItems: orderedItems,
+          uniqueKey: uniqueKey,
+          orderId: orderId,
+          shopName: shopName,
+          userId: userId,
+          timestamp: timestamp,
+        ),
+      ),
+    );
+
+    /*
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -198,6 +218,7 @@ class _CartPageState extends State<CartPage> {
         ),
       ),
     );
+    */
   }
 
 
